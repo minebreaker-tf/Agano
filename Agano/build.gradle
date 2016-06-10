@@ -13,6 +13,8 @@ repositories {
 dependencies {
     compile(
             'com.google.guava:guava:19.0',
+            'com.google.gson:gson:2.6.2',
+            'com.google.code.findbugs:jsr305:2.0.1',
             'org.slf4j:slf4j-api:1.7.21',
             'org.slf4j:slf4j-jdk14:1.7.21',
     )
