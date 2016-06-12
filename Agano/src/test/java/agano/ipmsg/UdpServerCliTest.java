@@ -2,6 +2,7 @@ package agano.ipmsg;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.bind.DatatypeConverter;
@@ -10,12 +11,14 @@ import java.nio.ByteBuffer;
 
 public class UdpServerCliTest {
 
+    @Ignore
     @Test
     public void test() throws Exception {
         EventBus eventBus = new EventBus();
         eventBus.register(this);
         UdpServer server = new UdpServer(eventBus, new InetSocketAddress(2425));
         server.start();
+        System.out.println("run");
         Thread.sleep(100000);
     }
 

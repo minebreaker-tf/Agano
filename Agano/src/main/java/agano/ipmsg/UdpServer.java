@@ -13,6 +13,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,29 +52,30 @@ public final class UdpServer {
     }
 
     public void start() throws Exception {
-        logger.info("Starts listening...");
+        executorService.submit(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                logger.info("Starts listening...");
 
-        Selector selector = Selector.open();
-        logger.info("1");
-        channel.register(selector, SelectionKey.OP_READ);
-        logger.info("2");
-        logger.info(selector.isOpen() + "");
-        while (selector.select() > 0) {
-            logger.info("3");
-            for (Iterator<SelectionKey> i = selector.selectedKeys().iterator(); i.hasNext(); ) {
-                SelectionKey key = i.next();
-                i.remove();
-                if (key.isValid() && key.isReadable()) {
-                    logger.info("Received");
-                    DatagramChannel acceptable = (DatagramChannel) key.channel();
-                    ByteBuffer buf = ByteBuffer.allocate(bufferCapacity);
-                    acceptable.receive(buf);
-                    buf.flip();
-                    eventBus.post(buf);
+                Selector selector = Selector.open();
+                channel.register(selector, SelectionKey.OP_READ);
+                while (selector.select() > 0) {
+                    for (Iterator<SelectionKey> i = selector.selectedKeys().iterator(); i.hasNext(); ) {
+                        SelectionKey key = i.next();
+                        i.remove();
+                        if (key.isValid() && key.isReadable()) {
+                            logger.info("Received");
+                            DatagramChannel acceptable = (DatagramChannel) key.channel();
+                            ByteBuffer buf = ByteBuffer.allocate(bufferCapacity);
+                            acceptable.receive(buf);
+                            buf.flip();
+                            eventBus.post(buf);
+                        }
+                    }
                 }
+                return null;
             }
-        }
-        logger.info("End");
+        });
     }
 
     public void stop() {
