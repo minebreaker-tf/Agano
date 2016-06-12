@@ -24,45 +24,73 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class UdpIntegrationTest {
 
     private List<String> reveivedData;
+    private EventBus eventBus;
+    private SocketAddress address;
+    private SocketAddress remote;
+    private UdpServer server;
+    private UdpSender sender;
 
     @Before
     public void setUp() {
-        reveivedData  = Collections.synchronizedList(new ArrayList<String>());
+        eventBus = new EventBus();
+        eventBus.register(this);
+
+        address = new InetSocketAddress(2425);
+        remote = new InetSocketAddress("localhost", 2425);
+        server = new UdpServer(eventBus, address);
+        sender = new UdpSender();
+
+        reveivedData = Collections.synchronizedList(new ArrayList<String>());
     }
 
     @After
     public void tearDown() {
+
+        server.stop();
+        server = null;
+        sender.close();
+        sender = null;
+
         reveivedData = null;
     }
 
+    /*
+     * 自ソケットに向けて送受信を試み、正しく動いていることを確認する
+     */
     @Ignore
     @Test
     public void test() throws Exception {
-        EventBus eventBus = new EventBus();
-        eventBus.register(this);
 
-        SocketAddress address = new InetSocketAddress("localhost", 2425);
-        UdpServer server = new UdpServer(eventBus, address);
         server.start();
 
-        UdpSender sender = new UdpSender(address);
         ByteBuffer load = ByteBuffer.allocate(1);
 
         load.put((byte) 0xFF).flip();
-        sender.send(load);
+        sender.send(remote, load);
         Thread.sleep(1000);
         load.clear();
         load.put((byte) 0x00).flip();
-        sender.send(load);
+        sender.send(remote, load);
         Thread.sleep(1000);
         load.clear();
         load.put((byte) 0x11).flip();
-        sender.send(load);
+        sender.send(remote, load);
 
-        Thread.sleep(10000);
+        Thread.sleep(1000);
+
         assertThat(reveivedData.get(0), is("FF"));
         assertThat(reveivedData.get(1), is("00"));
         assertThat(reveivedData.get(2), is("11"));
+    }
+
+    /*
+     * 手動で実行し、オリジナルのIPmsgからデータを送り受信を試みるためのテスト
+     */
+    @Ignore
+    @Test
+    public void testReceive() throws Exception {
+        server.start();
+        Thread.sleep(Long.MAX_VALUE);
     }
 
     @Subscribe

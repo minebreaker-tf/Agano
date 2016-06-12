@@ -1,6 +1,7 @@
 package agano.ipmsg;
 
 import javax.annotation.Nullable;
+import java.nio.ByteBuffer;
 
 public final class Message {
 
@@ -10,6 +11,10 @@ public final class Message {
     public Message(int status, @Nullable String text) {
         this.status = status;
         this.text = text != null ? text : "";
+    }
+
+    public static Message fromByte(ByteBuffer original) {
+        return null;
     }
 
     public Message(int status) {
