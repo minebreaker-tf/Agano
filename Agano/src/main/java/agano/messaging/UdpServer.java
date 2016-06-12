@@ -1,4 +1,4 @@
-package agano.ipmsg;
+package agano.messaging;
 
 import agano.util.AganoException;
 import com.google.common.eventbus.EventBus;
@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -19,7 +20,8 @@ import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class UdpServer {
+// TODO: GuavaのServiceを実装
+public final class UdpServer implements Closeable {
 
     private static Logger logger = LoggerFactory.getLogger(UdpServer.class);
 
@@ -39,9 +41,9 @@ public final class UdpServer {
 
         try {
             this.channel = DatagramChannel.open();
+            this.channel.socket().setReuseAddress(true);
             this.channel.configureBlocking(false);
             this.channel.socket().bind(address);
-//            this.channel.connect(address);
         } catch (IOException e) {
             logger.warn("Failed to initialize socket", e);
             throw new AganoException(e);
@@ -90,7 +92,13 @@ public final class UdpServer {
 
     @Override
     protected void finalize() throws Throwable {
+        stop();
         super.finalize();
-        executorService.shutdown();
     }
+
+    @Override
+    public void close() throws IOException {
+        stop();
+    }
+
 }
