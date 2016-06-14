@@ -1,32 +1,78 @@
 package agano.ipmsg;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
-public final class Message {
+public class Message {
 
-    private final int status;
-    private final String text;
+    private final String version;
+    private final long packetNumber;
+    private final String user;
+    private final String host;
+    private final long command;
+    private final String load;
 
-    public Message(int status, @Nullable String text) {
-        this.status = status;
-        this.text = text != null ? text : "";
+    public Message(
+            @Nonnull String version,
+            long packetNumber,
+            @Nonnull String user,
+            @Nonnull String host,
+            long command,
+            @Nonnull String load) {
+        this.version = version;
+        this.packetNumber = packetNumber;
+        this.user = user;
+        this.host = host;
+        this.command = command;
+        this.load = load;
     }
 
-    public static Message fromByte(ByteBuffer original) {
-        return null;
+    /**
+     * パケットの一意性は、「パケット番号：IPアドレス：ソースポート」で判断されます。
+     * …ソースポートってなんだ
+     *
+     * @return ハッシュコード
+     */
+    @Override
+    public int hashCode() {
+        return 34; // TODO
     }
 
-    public Message(int status) {
-        this(status, "");
+    // TODO: 実装が正しいか後で確認
+    @Override
+    public boolean equals(Object object) {
+        return object != null &&
+                object instanceof  Message &&
+                object.hashCode() == this.hashCode();
     }
 
-    public int getStatus() {
-        return status;
+    @Nonnull
+    public String getVersion() {
+        return version;
     }
 
-    public String getText() {
-        return text;
+    public long getPacketNumber() {
+        return packetNumber;
+    }
+
+    @Nonnull
+    public String getUser() {
+        return user;
+    }
+
+    @Nonnull
+    public String getHost() {
+        return host;
+    }
+
+    public long getCommand() {
+        return command;
+    }
+
+    @Nonnull
+    public String getLoad() {
+        return load;
     }
 
 }

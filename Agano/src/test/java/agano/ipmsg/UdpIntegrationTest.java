@@ -94,7 +94,7 @@ public class UdpIntegrationTest {
     }
 
     @Subscribe
-    public void out(ByteBuffer buf) {
+    public void received(ByteBuffer buf) {
         byte[] temp = new byte[buf.remaining()];
         for (int i = 0; buf.hasRemaining(); i++) {
             temp[i] = buf.get();
@@ -104,6 +104,5 @@ public class UdpIntegrationTest {
 
         reveivedData.add(DatatypeConverter.printHexBinary(temp));
     }
-
 
 }

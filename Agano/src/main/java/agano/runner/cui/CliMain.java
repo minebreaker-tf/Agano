@@ -1,4 +1,4 @@
-package agano.runner;
+package agano.runner.cui;
 
 public class CliMain {
 

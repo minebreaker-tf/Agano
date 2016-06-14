@@ -1,4 +1,4 @@
-package agano.runner;
+package agano.runner.gui;
 
 public class GuiMain {
 
