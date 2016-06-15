@@ -7,9 +7,9 @@ public final class IpmsgProtocolUtils {
     public static final long commandMask = 0x000000ff;
     public static final long optionMask = 0xffffff00;
 
-    IpmsgProtocol getCommand(long value) {
+    IpmsgProtocolCommand getCommand(long value) {
         long command = commandMask & value;
-        for (IpmsgProtocol each : IpmsgProtocol.values()) {
+        for (IpmsgProtocolCommand each : IpmsgProtocolCommand.values()) {
             if (each.getValue() == command)
                 return each;
         }
@@ -17,9 +17,9 @@ public final class IpmsgProtocolUtils {
         throw new NoSuchElementException("No valid command found");
     }
 
-    IpmsgProtocol getOption(long value) {
+    IpmsgProtocolCommand getOption(long value) {
         long option = optionMask & value;
-        for (IpmsgProtocol each : IpmsgProtocol.values()) {
+        for (IpmsgProtocolCommand each : IpmsgProtocolCommand.values()) {
             if (each.getValue() == option) {
                 return each;
             }
