@@ -1,4 +1,4 @@
-package agano.ipmsg;
+package agano.ipmsg.oldones;
 
 import agano.util.AganoException;
 

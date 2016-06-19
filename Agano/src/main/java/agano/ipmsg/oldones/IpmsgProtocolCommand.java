@@ -1,4 +1,4 @@
-package agano.ipmsg;
+package agano.ipmsg.oldones;
 
 /**
  * コマンドに使われる定数<br />

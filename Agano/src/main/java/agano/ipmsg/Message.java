@@ -36,8 +36,7 @@ public class Message {
             @Nonnull String version,
             long packetNumber,
             @Nonnull String user,
-            @Nonnull String host,
-            long command, @Nonnull String load, int port) {
+            @Nonnull String host, long command, @Nonnull String load, int port) {
         this.version = version;
         this.packetNumber = packetNumber;
         this.user = user;
