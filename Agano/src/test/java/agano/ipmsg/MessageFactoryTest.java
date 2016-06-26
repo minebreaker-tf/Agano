@@ -23,7 +23,7 @@ public class MessageFactoryTest {
         assertThat(message.getPacketNumber(), is(123L));
         assertThat(message.getUser(), is("user"));
         assertThat(message.getHost(), is("host"));
-        assertThat(message.getCommand(), is(1L));
+        assertThat(message.getOperation().get(), is(1L));
         assertThat(message.getLoad(), is("積み荷1:積み荷2"));
         assertThat(message.getPort(), is(2425));
     }

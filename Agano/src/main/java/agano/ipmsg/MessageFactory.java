@@ -21,7 +21,15 @@ public final class MessageFactory {
         checkNotNull(originalMessage);
 
         String converted = byteToString(originalMessage, Charsets.shiftJIS());
-        List<String> packet = split(converted);
+
+        return fromString(converted, port);
+    }
+
+    @Nonnull
+    public static Message fromString(@Nonnull String message, int port) {
+        checkNotNull(message);
+
+        List<String> packet = split(message);
 
         return new Message(
                 packet.get(0),

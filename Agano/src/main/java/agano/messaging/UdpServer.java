@@ -53,7 +53,7 @@ public final class UdpServer implements Closeable {
 
     }
 
-    public void start() throws Exception {
+    public void start() {
         executorService.submit(new Callable<Object>() {
             @Override
             public Object call() throws Exception {

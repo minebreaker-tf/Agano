@@ -18,7 +18,7 @@ public class Message {
     private final long packetNumber;
     private final String user;
     private final String host;
-    private final long command;
+    private final Operation operation;
     private final String load;
     private final int port;
 
@@ -36,12 +36,15 @@ public class Message {
             @Nonnull String version,
             long packetNumber,
             @Nonnull String user,
-            @Nonnull String host, long command, @Nonnull String load, int port) {
+            @Nonnull String host,
+            long command,
+            @Nonnull String load,
+            int port) {
         this.version = version;
         this.packetNumber = packetNumber;
         this.user = user;
         this.host = host;
-        this.command = command;
+        this.operation = new Operation(command);
         this.load = load;
         this.port = port;
     }
@@ -65,7 +68,7 @@ public class Message {
     // TODO: 実装が正しいか後で確認
     @Override
     public boolean equals(Object object) {
-        return object != null &&
+        return object != null && // TODO: GuavaのChainで置き換え
                object instanceof Message &&
                ((Message) object).getPacketNumber() == this.getPacketNumber() &&
                ((Message) object).getHost()
@@ -82,7 +85,7 @@ public class Message {
     @Override
     public String toString() {
         return Joiner.on(":")
-                .join(Constants.protocolVersion, packetNumber, user, host, command, load);
+                     .join(Constants.protocolVersion, packetNumber, user, host, operation, load);
     }
 
     @Nonnull
@@ -104,8 +107,8 @@ public class Message {
         return host;
     }
 
-    public long getCommand() {
-        return command;
+    public Operation getOperation() {
+        return operation;
     }
 
     @Nonnull

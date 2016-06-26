@@ -5,6 +5,8 @@ import com.google.common.base.Optional;
 import javax.annotation.Nonnull;
 import java.util.EnumSet;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public final class Operation {
 
     private final long code;
@@ -15,13 +17,24 @@ public final class Operation {
         this.code = raw;
 
         Optional<Command> value = Command.find(code);
-        if (value.isPresent()) {
-            command = value.get();
-        } else {
-            command = Command.IPMSG_NOOPERATION;
+        command = value.or(Command.IPMSG_NOOPERATION);
+
+        this.options = Option.find(code);
+    }
+
+    Operation(Command command, EnumSet<Option> options) {
+        checkNotNull(command);
+        checkNotNull(options);
+
+        this.command = command;
+        this.options = options.clone();
+
+        long code = command.getCode();
+        for (Option op : options) {
+            code |= op.getCode();
         }
 
-        options = Option.find(code);
+        this.code = code;
     }
 
     public long get() {
@@ -38,8 +51,16 @@ public final class Operation {
         return EnumSet.copyOf(options);
     }
 
-    public boolean isEnabledOption(Option option) {
+    public boolean isEnabledOption(@Nonnull Option option) {
+        checkNotNull(option);
         return options.contains(option);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other != null &&
+               other instanceof Operation &&
+               this.code == ((Operation) other).code;
     }
 
     @Override
