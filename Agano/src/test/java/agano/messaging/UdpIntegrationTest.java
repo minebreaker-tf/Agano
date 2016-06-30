@@ -1,4 +1,4 @@
-package agano.ipmsg;
+package agano.messaging;
 
 import agano.messaging.UdpSender;
 import agano.messaging.UdpServer;

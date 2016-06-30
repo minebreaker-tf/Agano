@@ -6,32 +6,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.util.Iterator;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: GuavaのServiceを実装
-public final class UdpServer implements Closeable {
+public final class TcpServer implements Closeable {
 
-    private static Logger logger = LoggerFactory.getLogger(UdpServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(TcpServer.class);
     private static final int bufferCapacity = 1024;
 
-    private final DatagramChannel channel;
+    private final ServerSocketChannel channel;
     private final SocketAddress address;
-    private final EventBus eventBus;
     private final ExecutorService executorService;
+    private final EventBus eventBus;
 
-    public UdpServer(@Nonnull EventBus eventBus, @Nonnull SocketAddress address) {
+    public TcpServer(@Nonnull EventBus eventBus, @Nonnull SocketAddress address) {
 
         checkNotNull(eventBus);
         checkNotNull(address);
@@ -40,7 +39,7 @@ public final class UdpServer implements Closeable {
         this.address = address;
 
         try {
-            this.channel = DatagramChannel.open();
+            this.channel = ServerSocketChannel.open();
             this.channel.socket().setReuseAddress(true);
             this.channel.configureBlocking(false);
             this.channel.socket().bind(address);
@@ -50,40 +49,35 @@ public final class UdpServer implements Closeable {
         }
 
         this.executorService = Executors.newSingleThreadExecutor();
-
     }
 
     public void start() {
         executorService.submit(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
-                logger.info("Starts listening...");
+                while (true) {
+                    SocketChannel accepted = channel.accept();
+                    if (accepted == null) continue;
 
-                Selector selector = Selector.open();
-                channel.register(selector, SelectionKey.OP_READ);
-                while (selector.select() > 0) {
-                    for (Iterator<SelectionKey> i = selector.selectedKeys().iterator(); i.hasNext(); ) {
-                        SelectionKey key = i.next();
-                        i.remove();
-                        if (key.isValid() && key.isReadable()) {
-                            logger.info("Received");
-                            DatagramChannel acceptable = (DatagramChannel) key.channel();
-                            // TODO: メモリ周りおかしくないか
-                            ByteBuffer buf = ByteBuffer.allocate(bufferCapacity);
-                            acceptable.receive(buf);
-                            buf.flip();
-                            eventBus.post(buf); // TODO: ラッパークラス作成
-                        }
+                    BufferedInputStream bis = new BufferedInputStream(
+                            accepted.socket().getInputStream());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buf = new byte[bufferCapacity];
+                    for (int len = 0; (len = bis.read(buf)) > 0; ) {
+                        baos.write(buf);
                     }
+                    baos.close();
+                    ByteBuffer received = ByteBuffer.wrap(baos.toByteArray());
+                    eventBus.post(received);
+                    accepted.close();
                 }
-                return null;
             }
         });
     }
 
     public void stop() {
+        executorService.shutdown();
         try {
-            executorService.shutdown();
             channel.close();
         } catch (IOException e) {
             logger.warn("Failed to close socket", e);
@@ -92,14 +86,14 @@ public final class UdpServer implements Closeable {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    public void close() {
         stop();
-        super.finalize();
     }
 
     @Override
-    public void close() {
+    protected void finalize() throws Throwable {
         stop();
+        super.finalize();
     }
 
 }
