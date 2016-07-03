@@ -15,6 +15,7 @@ dependencies {
             'com.google.guava:guava:19.0',
             'com.google.code.gson:gson:2.7',
             'com.google.code.findbugs:jsr305:2.0.1',
+            'com.miglayout:miglayout-swing:5.0',
             'org.slf4j:slf4j-api:1.7.21',
             'org.slf4j:slf4j-jdk14:1.7.21',
 
