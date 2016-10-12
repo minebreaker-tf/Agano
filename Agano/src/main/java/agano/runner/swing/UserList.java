@@ -1,4 +1,4 @@
-package agano.runner.ui;
+package agano.runner.swing;
 
 import javax.swing.*;
 import java.awt.*;

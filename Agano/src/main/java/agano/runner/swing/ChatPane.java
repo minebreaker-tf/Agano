@@ -1,4 +1,4 @@
-package agano.runner.ui;
+package agano.runner.swing;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +6,7 @@ import java.awt.*;
 public class ChatPane extends JSplitPane {
 
     private JTextPane chatText;
-    private JTextArea textInput;
+    private ChatTextInput textInput;
 
     public ChatPane() {
         super(VERTICAL_SPLIT);
@@ -20,9 +20,8 @@ public class ChatPane extends JSplitPane {
         chatText.setMargin(new Insets(0, 0, 0, 0));
         chatText.setEditable(false);
 
-        textInput = new JTextArea("Mock input");
+        textInput = new ChatTextInput();
         textInput.setBorder(BorderFactory.createEmptyBorder());
-        textInput.setMargin(new Insets(0, 0, 0, 0));
 
         this.setLeftComponent(chatText);
         this.setRightComponent(textInput);
@@ -31,12 +30,12 @@ public class ChatPane extends JSplitPane {
         this.setDividerSize(5);
     }
 
-    public JTextArea getTextInput() {
-        return textInput;
-    }
-
     public JTextPane getChatText() {
         return chatText;
+    }
+
+    public ChatTextInput getTextInput() {
+        return textInput;
     }
 
 }
