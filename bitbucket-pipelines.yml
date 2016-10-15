@@ -4,5 +4,6 @@ pipelines:
   default:
     - step:
         script:
-          - chmod 777 Agano/gradlew
-          - ./Agano/gradlew build
+          - cd ./Agano/
+          - chmod 777 gradlew
+          - ./gradlew build
