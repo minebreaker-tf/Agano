@@ -28,4 +28,9 @@ public class MessageFactoryTest {
         assertThat(message.getPort(), is(2425));
     }
 
+    @Test(expected = MalformedMessageException.class)
+    public void testInvalid() {
+        MessageFactory.fromString("Some invalid string", 2425);
+    }
+
 }

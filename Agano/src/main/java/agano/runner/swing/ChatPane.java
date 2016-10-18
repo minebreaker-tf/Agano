@@ -1,41 +1,31 @@
 package agano.runner.swing;
 
+import com.google.inject.Inject;
+
 import javax.swing.*;
-import java.awt.*;
 
-public class ChatPane extends JSplitPane {
+public final class ChatPane extends JSplitPane {
 
-    private JTextPane chatText;
-    private ChatTextInput textInput;
+    private final ChatTextView chatView;
+    private final ChatTextInput input;
 
-    public ChatPane() {
+    @Inject
+    public ChatPane(ChatTextView chatView, ChatTextInput input) {
         super(VERTICAL_SPLIT);
-        this.setMinimumSize(new Dimension(100, 100));
 
+        this.chatView = chatView;
+        this.input = input;
+
+//        this.setMinimumSize(new Dimension(100, 100));
         this.setBorder(BorderFactory.createEmptyBorder());
 
-        chatText = new JTextPane();
-        chatText.setText("Mock chat!");
-        chatText.setBorder(BorderFactory.createEmptyBorder());
-        chatText.setMargin(new Insets(0, 0, 0, 0));
-        chatText.setEditable(false);
+        input.setBorder(BorderFactory.createEmptyBorder());
 
-        textInput = new ChatTextInput();
-        textInput.setBorder(BorderFactory.createEmptyBorder());
-
-        this.setLeftComponent(chatText);
-        this.setRightComponent(textInput);
+        this.setLeftComponent(chatView);
+        this.setRightComponent(input);
 
         this.setDividerLocation(300) ;
         this.setDividerSize(5);
-    }
-
-    public JTextPane getChatText() {
-        return chatText;
-    }
-
-    public ChatTextInput getTextInput() {
-        return textInput;
     }
 
 }

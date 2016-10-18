@@ -1,27 +1,30 @@
 package agano.runner.controller;
 
-import agano.runner.parameter.Binder;
-import agano.runner.parameter.Parameter;
-import agano.runner.parameter.State;
+import agano.runner.parameter.SendMessageParameter;
+import agano.runner.state.StateManager;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
-    private final Binder binder;
+    private final StateManager manager;
 
-    public Controller(Binder binder) {
-        this.binder = binder;
+    @Inject
+    public Controller(StateManager manager) {
+        this.manager = manager;
     }
 
     @Subscribe
-    public void subscribe(Parameter parameter) {
-        logger.info("Received: {}", parameter.getMessage());
+    public void sendMessage(SendMessageParameter parameter) {
+        logger.debug("Received: {}", parameter.getMessage());
 
-        binder.bind(new State(parameter.getMessage()));
+        manager.swap(state -> state.swapChatText(parameter.getMessage()));
     }
 
 }

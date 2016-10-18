@@ -1,42 +1,56 @@
 package agano.runner.swing;
 
+import agano.runner.state.State;
+import agano.util.Constants;
+import com.google.inject.Inject;
+
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-public final class MainForm extends JFrame {
+public final class MainForm implements Observer<State> {
 
-    private JSplitPane splitPane;
-    private UserList userList;
-    private ChatPane chatPane;
+    private final JFrame frame;
+    private final JSplitPane splitPane;
+    private final UserList userList;
+    private final ChatPane chatPane;
 
-    public MainForm() {
+    @Inject
+    public MainForm(UserList userList, ChatPane chatPane) {
 
-        this.setTitle("Agano");
-        this.setSize(600, 400);
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame = new JFrame();
+        frame.setTitle(Constants.title);
+        frame.setSize(800, 450);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                // TODO callback
+                System.out.println("App exits.");
+                System.exit(0);
+            }
+        });
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-
-        userList = new UserList();
-        splitPane.setLeftComponent(userList);
-
-        chatPane = new ChatPane();
-        splitPane.setRightComponent(chatPane);
 
         splitPane.setDividerLocation(200);
         splitPane.setDividerSize(5);
 
-        this.getContentPane().add(splitPane);
+        frame.getContentPane().add(splitPane);
 
-        this.setVisible(true);
+        this.userList = userList;
+        splitPane.setLeftComponent(userList);
+
+        this.chatPane = chatPane;
+        splitPane.setRightComponent(chatPane);
+
+        frame.setVisible(true);
 
     }
 
-    public UserList getUserList() {
-        return userList;
-    }
+    @Override
+    public void update(State state) {
 
-    public ChatPane getChatPane() {
-        return chatPane;
     }
 
 }

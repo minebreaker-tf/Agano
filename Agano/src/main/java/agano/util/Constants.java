@@ -12,4 +12,8 @@ public final class Constants {
     public static final String defaultFont = "/agano/font/mplus-1c-light.ttf";
     public static final int defaultFontSize = 16;
 
+    public static final String title = "Agano";
+
+    public static final int port = 2425;
+
 }

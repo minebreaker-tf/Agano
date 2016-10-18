@@ -1,10 +1,10 @@
 package agano.runner.parameter;
 
-public final class Parameter {
+public final class SendMessageParameter {
 
     private final String message;
 
-    public Parameter(String message) {
+    public SendMessageParameter(String message) {
         this.message = message;
     }
 

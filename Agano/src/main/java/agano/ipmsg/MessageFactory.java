@@ -29,17 +29,24 @@ public final class MessageFactory {
     public static Message fromString(@Nonnull String message, int port) {
         checkNotNull(message);
 
-        List<String> packet = split(message);
+        try {
 
-        return new Message(
-                packet.get(0),
-                Long.valueOf(packet.get(1)),
-                packet.get(2),
-                packet.get(3),
-                Long.valueOf(packet.get(4)),
-                packet.get(5),
-                port
-        );
+            List<String> packet = split(message);
+
+            return new Message(
+                    packet.get(0),
+                    Long.valueOf(packet.get(1)),
+                    packet.get(2),
+                    packet.get(3),
+                    Long.valueOf(packet.get(4)),
+                    packet.get(5),
+                    port
+            );
+
+        } catch (IndexOutOfBoundsException e) {
+            throw new MalformedMessageException(message);
+        }
+
     }
 
     /**

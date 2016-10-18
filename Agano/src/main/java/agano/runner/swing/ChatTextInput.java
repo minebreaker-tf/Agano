@@ -1,13 +1,21 @@
 package agano.runner.swing;
 
+import agano.runner.parameter.SendMessageParameter;
+import com.google.common.eventbus.EventBus;
+import com.google.inject.Inject;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class ChatTextInput extends JScrollPane {
+public final class ChatTextInput extends JScrollPane {
 
+    private final EventBus eventBus;
     private final JTextArea textArea;
 
-    public ChatTextInput() {
+    @Inject
+    public ChatTextInput(EventBus eventBus) {
+
+        this.eventBus = eventBus;
 
         textArea = new JTextArea();
 
@@ -17,17 +25,15 @@ public class ChatTextInput extends JScrollPane {
         textArea.getActionMap().put("submit-message", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // send event
-                textArea.setText("");
+                eventBus.post(new SendMessageParameter(textArea.getText()));
+                SwingUtilities.invokeLater(() -> textArea.setText(""));
             }
         });
 
+        textArea.setText("mock input");
+
         this.getViewport().setView(textArea);
 
-    }
-
-    public JTextArea getTextArea() {
-        return textArea;
     }
 
 }
