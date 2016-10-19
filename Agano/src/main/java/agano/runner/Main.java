@@ -2,8 +2,11 @@ package agano.runner;
 
 import agano.libraries.guice.EventBusModule;
 import agano.messaging.NettyUdpServer;
+import agano.messaging.ServerModule;
 import agano.runner.controller.Controller;
+import agano.runner.state.StateManager;
 import agano.runner.swing.MainForm;
+import agano.runner.swing.SwingModule;
 import agano.util.Constants;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
@@ -12,6 +15,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,9 +31,12 @@ public final class Main {
 
     public static void main(String[] args) {
 
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
         setLaf();
 
-        Injector injector = Guice.createInjector(new EventBusModule());
+        Injector injector = Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule());
         Main application = injector.getInstance(Main.class);
 
         prepareWindow(application.form);
@@ -37,11 +44,27 @@ public final class Main {
     }
 
     @Inject
-    public Main(MainForm form, EventBus eventBus, Controller controller, NettyUdpServer udpServer) {
-        this.form = form;
-        this.udpServer = udpServer;
+    public Main(
+            MainForm.Factory formFactory,
+            EventBus eventBus,
+            StateManager stateManager,
+            Controller controller,
+            NettyUdpServer.Factory udpServerFactory) {
+
+        this.udpServer = udpServerFactory.newInstance(Constants.port);
+        this.form = formFactory.newInstance(event -> {
+            try {
+                udpServer.shutdown().sync();
+            } catch (InterruptedException e) {
+                logger.warn("Failed to shutdown the server.", e);
+            }
+            logger.debug("Application is about to shutdown successfully. Event: {}", event);
+            System.exit(0);
+        });
+        stateManager.register(form);
 
         eventBus.register(controller);
+
     }
 
     private static void setLaf() {

@@ -3,8 +3,11 @@ package agano.runner.state;
 import agano.runner.swing.Observer;
 import com.google.inject.Singleton;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public final class StateManager {
@@ -13,19 +16,24 @@ public final class StateManager {
     private Observer<State> observer;
 
     public StateManager() {
-        state = new AtomicReference<>(new State(""));
+        state = new AtomicReference<>(State.initialState());
     }
 
     public State get() {
         return state.get();
     }
 
-    public void swap(UnaryOperator<State> updater) {
+    /**
+     * {@code register}を呼び出し、observerを登録した後に呼び出すこと
+     *
+     * @param updater 状態を変更する関数
+     */
+    public void swap(@Nonnull UnaryOperator<State> updater) {
         observer.update(state.updateAndGet(updater));
     }
 
-    public synchronized void register(Observer<State> view) {
-        this.observer = view;
+    public synchronized void register(@Nonnull Observer<State> view) {
+        this.observer = checkNotNull(view);
     }
 
 }
