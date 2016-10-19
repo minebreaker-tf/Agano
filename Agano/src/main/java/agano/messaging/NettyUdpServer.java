@@ -19,9 +19,7 @@ import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
-
-public final class NettyUdpServer implements Closeable {
+public final class NettyUdpServer {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyUdpServer.class);
 
@@ -63,11 +61,6 @@ public final class NettyUdpServer implements Closeable {
 
     public Future shutdown() {
         return group.shutdownGracefully();
-    }
-
-    @Override
-    public void close() {
-        group.shutdownGracefully();
     }
 
     /**

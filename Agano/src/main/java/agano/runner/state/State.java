@@ -26,7 +26,8 @@ public final class State {
         return chatText;
     }
 
-    public State swapChatText(String chatText) {
+    @Nonnull
+    public State swapChatText(@Nonnull String chatText) {
         checkNotNull(chatText);
 
         State newState = copy();

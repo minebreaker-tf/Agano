@@ -75,6 +75,7 @@ public final class Main {
         }
     }
 
+    // TODO
     private static MainForm prepareWindow(MainForm form) {
         try {
             Font defaultFont = Font.createFont(

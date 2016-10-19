@@ -5,10 +5,13 @@ import agano.util.Constants;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.function.Consumer;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class MainForm implements Observer<State> {
 
@@ -53,7 +56,9 @@ public final class MainForm implements Observer<State> {
     }
 
     @Override
-    public void update(State state) {
+    public void update(@Nonnull State state) {
+        checkNotNull(state);
+
 
     }
 

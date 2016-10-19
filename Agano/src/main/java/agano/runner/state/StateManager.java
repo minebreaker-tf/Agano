@@ -19,12 +19,14 @@ public final class StateManager {
         state = new AtomicReference<>(State.initialState());
     }
 
+    @Nonnull
     public State get() {
         return state.get();
     }
 
     /**
-     * {@code register}を呼び出し、observerを登録した後に呼び出すこと
+     * {@code register}を呼び出し、observerを登録した後に呼び出すこと<br>
+     * updaterはnullを返してはいけない(が、保証されていないので注意)
      *
      * @param updater 状態を変更する関数
      */

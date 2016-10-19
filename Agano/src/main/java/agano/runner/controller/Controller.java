@@ -1,5 +1,6 @@
 package agano.runner.controller;
 
+import agano.runner.parameter.MessageReceivedParameter;
 import agano.runner.parameter.SendMessageParameter;
 import agano.runner.state.StateManager;
 import com.google.common.eventbus.Subscribe;
@@ -22,9 +23,16 @@ public class Controller {
 
     @Subscribe
     public void sendMessage(SendMessageParameter parameter) {
-        logger.debug("Received: {}", parameter.getMessage());
+        logger.debug("Sending: {}", parameter.getMessage());
 
         manager.swap(state -> state.swapChatText(parameter.getMessage()));
+    }
+
+    @Subscribe
+    public void receiveMessage(MessageReceivedParameter parameter) {
+        logger.debug("Received: {}", parameter.getRecipant());
+
+        
     }
 
 }
