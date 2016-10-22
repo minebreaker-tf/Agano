@@ -3,11 +3,13 @@ package agano.ipmsg;
 import agano.util.Charsets;
 import agano.util.Constants;
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 import static agano.util.StringUtils.stringToByteBuffer;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * 送受信に使われるメッセージを表す
@@ -31,7 +33,6 @@ public class Message {
      * @param load         拡張部
      * @param port         メッセージの送信元ポート
      */
-    // パッケージプライベートにしようかなあ
     public Message(
             @Nonnull String version,
             long packetNumber,
@@ -40,12 +41,12 @@ public class Message {
             long command,
             @Nonnull String load,
             int port) {
-        this.version = version;
+        this.version = checkNotNull(version);
         this.packetNumber = packetNumber;
-        this.user = user;
-        this.host = host;
-        this.operation = new Operation(command);
-        this.load = load;
+        this.user = checkNotNull(user);
+        this.host = checkNotNull(host);
+        this.operation = checkNotNull(new Operation(command));
+        this.load = checkNotNull(load);
         this.port = port;
     }
 
@@ -72,7 +73,7 @@ public class Message {
                object instanceof Message &&
                ((Message) object).getPacketNumber() == this.getPacketNumber() &&
                ((Message) object).getHost()
-                       .equals(this.getHost()) &&
+                                 .equals(this.getHost()) &&
                ((Message) object).getPort() == this.getPort();
     }
 
@@ -86,6 +87,18 @@ public class Message {
     public String toString() {
         return Joiner.on(":")
                      .join(Constants.protocolVersion, packetNumber, user, host, operation, load);
+    }
+
+    public String explain() {
+        return MoreObjects.toStringHelper(this)
+                          .add("Version", version)
+                          .add("PacketNumber", packetNumber)
+                          .add("User", user)
+                          .add("Host", host)
+                          .add("Operation", operation.explain())
+                          .add("Load", load)
+                          .add("Port", port)
+                          .toString();
     }
 
     @Nonnull

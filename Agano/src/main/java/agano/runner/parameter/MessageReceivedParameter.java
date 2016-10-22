@@ -8,15 +8,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class MessageReceivedParameter {
 
-    private final Message recipant;
+    private final Message receivedMessage;
 
     public MessageReceivedParameter(@Nonnull Message recipient) {
-        this.recipant = checkNotNull(recipient);
+        this.receivedMessage = checkNotNull(recipient);
     }
 
     @Nonnull
-    public Message getRecipant() {
-        return recipant;
+    public Message getMessage() {
+        return receivedMessage;
     }
 
 }

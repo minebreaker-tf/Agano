@@ -14,6 +14,6 @@ public final class Constants {
 
     public static final String title = "Agano";
 
-    public static final int port = 2425;
+    public static final int defaultPort = 2425;
 
 }

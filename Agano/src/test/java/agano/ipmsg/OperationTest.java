@@ -22,7 +22,18 @@ public class OperationTest {
 
         long raw = 0x00000301;
 
-        assertThat(op.get(), is(raw));
+        assertThat(op.getCode(), is(raw));
+    }
+
+    @Test
+    public void testConstructorFromCode() {
+
+        Operation op = new Operation(0x00000301);
+
+        assertThat(op.getCommand(), is(Command.IPMSG_BR_ENTRY));
+        assertThat(op.getOptions().contains(Option.IPMSG_SENDCHECKOPT), is(true));
+        assertThat(op.getOptions().contains(Option.IPMSG_SECRETOPT), is(true));
+
     }
 
 }

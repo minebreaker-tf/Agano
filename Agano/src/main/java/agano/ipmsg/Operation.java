@@ -1,12 +1,16 @@
 package agano.ipmsg;
 
-import com.google.common.base.Optional;
+import com.google.common.base.MoreObjects;
 
 import javax.annotation.Nonnull;
 import java.util.EnumSet;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * 命令とオプションをひとまとめにしたクラス
+ */
 public final class Operation {
 
     private final long code;
@@ -17,7 +21,7 @@ public final class Operation {
         this.code = raw;
 
         Optional<Command> value = Command.find(code);
-        command = value.or(Command.IPMSG_NOOPERATION);
+        command = value.orElse(Command.IPMSG_NOOPERATION);
 
         this.options = Option.find(code);
     }
@@ -37,7 +41,7 @@ public final class Operation {
         this.code = code;
     }
 
-    public long get() {
+    public long getCode() {
         return code;
     }
 
@@ -66,6 +70,13 @@ public final class Operation {
     @Override
     public String toString() {
         return Long.toString(code);
+    }
+
+    public String explain() {
+        return MoreObjects.toStringHelper(this)
+                .add("Command", command)
+                .add("Options", options)
+                .toString();
     }
 
 }
