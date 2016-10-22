@@ -2,7 +2,6 @@ package agano.runner;
 
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.OperationBuilder;
-import agano.ipmsg.Option;
 import agano.libraries.guice.EventBusModule;
 import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
@@ -23,10 +22,12 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import static agano.ipmsg.Command.IPMSG_BR_ENTRY;
+import static agano.ipmsg.Command.IPMSG_BR_EXIT;
 import static agano.ipmsg.Command.IPMSG_NOOPERATION;
 
 @Singleton
@@ -57,36 +58,36 @@ public final class Main {
             ServerManager serverManager) {
 
         this.udpServer = serverManager.getUdpServer();
-        this.form = formFactory.newInstance(event -> {
-            try {
-                udpServer.shutdown().sync();
-                logger.debug("Application is about to shutdown successfully. Event: {}", event);
-            } catch (InterruptedException e) {
-                logger.warn("Failed to shutdown the server.", e);
-            }
-            System.exit(0);
-        });
+        this.form = formFactory.newInstance(this::shutdown);
         prepareWindow(form);
         stateManager.register(form);
 
         eventBus.register(controller);
 
-        String greeting = "";
-        serverManager.getUdpServer().submit(
+        /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
+        udpServer.submit(
                 new MessageBuilder().setUp(IPMSG_NOOPERATION, "").build(),
-                new InetSocketAddress("192.168.0.12", Constants.defaultPort)
+                new InetSocketAddress("192.168.0.255", Constants.defaultPort) // TODO ブロードキャストアドレス
         );
-        serverManager.getUdpServer().submit(
-                new MessageBuilder().setUp(OperationBuilder.of(IPMSG_BR_ENTRY)
-                                                           .add(Option.IPMSG_ABSENCEOPT)
-                                                           .add(Option.IPMSG_SENDCHECKOPT)
-                                                           .add(Option.IPMSG_READCHECKOPT)
-                                                           .add(Option.IPMSG_SECRETOPT)
-                                                           .add(Option.IPMSG_SECRETEXOPT)
-                                                           .build(), "display-name\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:").build(),
-                new InetSocketAddress("192.168.0.12", Constants.defaultPort)
+        udpServer.submit(
+                new MessageBuilder().setUp(OperationBuilder.of(IPMSG_BR_ENTRY).build(), "").build(),
+                new InetSocketAddress("192.168.0.255", Constants.defaultPort)
         );
 
+    }
+
+    private void shutdown(WindowEvent event) {
+        udpServer.submit(
+                new MessageBuilder().setUp(IPMSG_BR_EXIT, "").build(),
+                new InetSocketAddress("192.168.0.255", Constants.defaultPort)
+        );
+        try {
+            udpServer.shutdown().sync();
+            logger.debug("Application is about to shutdown successfully. Event: {}", event);
+        } catch (InterruptedException e) {
+            logger.warn("Failed to shutdown the server.", e);
+        }
+        System.exit(0);
     }
 
     private static void setLaf() {

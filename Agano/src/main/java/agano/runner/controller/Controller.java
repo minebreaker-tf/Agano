@@ -1,7 +1,6 @@
 package agano.runner.controller;
 
-import agano.ipmsg.Message;
-import agano.ipmsg.MessageBuilder;
+import agano.ipmsg.*;
 import agano.messaging.ServerManager;
 import agano.runner.parameter.MessageReceivedParameter;
 import agano.runner.parameter.SendMessageParameter;
@@ -15,9 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
-import static agano.ipmsg.Command.IPMSG_ANSENTRY;
-import static agano.ipmsg.Command.IPMSG_BR_ENTRY;
-import static agano.ipmsg.Command.IPMSG_SENDMSG;
+import static agano.ipmsg.Command.*;
 
 @Singleton
 public class Controller {
@@ -39,7 +36,10 @@ public class Controller {
 
         // TEST
         serverManager.getUdpServer().submit(
-                new MessageBuilder().setUp(IPMSG_SENDMSG, "hey you!").build().toString(),
+                new MessageBuilder().setUp(
+                        OperationBuilder.of(IPMSG_SENDMSG).add(Option.IPMSG_NOADDLISTOPT).add(Option.IPMSG_SENDCHECKOPT).build(),
+                        parameter.getMessage()
+                ).build().toString(),
                 Charsets.shiftJIS(),
                 new InetSocketAddress("192.168.0.12", 2425)
         );
@@ -53,15 +53,22 @@ public class Controller {
         logger.debug("Received: {}", parameter.getMessage().explain());
 
         Message received = parameter.getMessage();
+        InetSocketAddress sender = new InetSocketAddress(received.getHost(), 2425);
+        Operation op = received.getOperation();
 
-        if (received.getOperation().getCommand().equals(IPMSG_BR_ENTRY)) {
+        if (op.getCommand().equals(IPMSG_BR_ENTRY)) {
             serverManager.getUdpServer().submit(
-                    new MessageBuilder().setUp(IPMSG_ANSENTRY, "").build().toString(),
-                    Charsets.shiftJIS(),
-                    new InetSocketAddress("192.168.0.12", 2425)
+                    new MessageBuilder().setUp(IPMSG_ANSENTRY, "").build(),
+                    sender
             );
-        } else if (received.getOperation().getCommand().equals(IPMSG_SENDMSG)) {
+        } else if (op.getCommand().equals(IPMSG_SENDMSG)) {
             logger.info("Message received: {}", received.getLoad());
+            if (op.isEnabledOption(Option.IPMSG_SENDCHECKOPT)) {
+                serverManager.getUdpServer().submit(
+                        new MessageBuilder().setUp(IPMSG_RECVMSG, "").build(),
+                        sender
+                );
+            }
         }
 
     }

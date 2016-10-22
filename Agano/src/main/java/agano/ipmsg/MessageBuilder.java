@@ -32,11 +32,11 @@ public final class MessageBuilder {
     public MessageBuilder setUp(@Nonnull Operation operation, @Nonnull String load) {
         this.version = Constants.protocolVersion;
         this.packetNumber = System.currentTimeMillis();
-        this.user = "default user"; // TODO
+        this.user = "default-user"; // TODO
         try {
             this.host = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logger.warn("Failed to detect local address..", e);
+            logger.warn("Failed to detect local address.", e);
             throw new AganoException(e);
         }
         this.operation = checkNotNull(operation);

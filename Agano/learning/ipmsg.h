@@ -1,15 +1,17 @@
-﻿/*	@(#)Copyright (C) H.Shirouzu 1996-2015   ipmsg.h	Ver3.50 */
+﻿/*	@(#)Copyright (C) H.Shirouzu 1996-2016   ipmsg.h	Ver4.00 */
 /* ========================================================================
 	Project  Name			: IP Messenger for Win32
 	Module Name				: Protocol Header
 	Create					: 1996-06-01(Sat)
-	Update					: 2015-06-02(Tue)
+	Update					: 2016-08-17(Wed)
 	Copyright				: H.Shirouzu
 	Reference				: 
 	======================================================================== */
 
 #ifndef IPMSG_H
 #define IPMSG_H
+
+#include "environ.h"
 
 /*  IP Messenger Communication Protocol version 3.0 define  */
 /*  macro  */
@@ -27,6 +29,7 @@
 #define IPMSG_BR_EXIT			0x00000002UL
 #define IPMSG_ANSENTRY			0x00000003UL
 #define IPMSG_BR_ABSENCE		0x00000004UL
+#define IPMSG_BR_NOTIFY			IPMSG_BR_ABSENCE
 
 #define IPMSG_BR_ISGETLIST		0x00000010UL
 #define IPMSG_OKGETLIST			0x00000011UL
@@ -63,7 +66,8 @@
 #define IPMSG_CAPUTF8OPT		0x01000000UL
 #define IPMSG_ENCEXTMSGOPT		0x04000000UL
 #define IPMSG_CLIPBOARDOPT		0x08000000UL
-#define IPMSG_CAPFILEENCOPT		0x00001000UL
+#define IPMSG_CAPFILEENC_OBSLT	0x00001000UL
+#define IPMSG_CAPFILEENCOPT		0x00040000UL
 
 /*  option for SENDMSG command  */
 #define IPMSG_SENDCHECKOPT		0x00000100UL
@@ -79,21 +83,24 @@
 #define IPMSG_SECRETEXOPT		(IPMSG_READCHECKOPT|IPMSG_SECRETOPT)
 
 /*  option for GETDIRFILES/GETFILEDATA command  */
-#define IPMSG_ENCFILEOPT		0x00000400UL
+#define IPMSG_ENCFILE_OBSLT		0x00000400UL
+#define IPMSG_ENCFILEOPT		0x00000800UL
 
 /*  obsolete option for send command  */
-#define IPMSG_NEWMULTIOPTOBSOLT	0x00040000UL
+#define IPMSG_NEWMULTI_OBSLT	0x00040000UL
 
 /* encryption/capability flags for encrypt command */
 #define IPMSG_RSA_512			0x00000001UL
 #define IPMSG_RSA_1024			0x00000002UL
 #define IPMSG_RSA_2048			0x00000004UL
+#define IPMSG_RSA_4096			0x00000008UL
 #define IPMSG_RC2_40			0x00001000UL
 #define IPMSG_BLOWFISH_128		0x00020000UL
 #define IPMSG_AES_256			0x00100000UL
 #define IPMSG_PACKETNO_IV		0x00800000UL
 #define IPMSG_ENCODE_BASE64		0x01000000UL
 #define IPMSG_SIGN_SHA1			0x20000000UL
+#define IPMSG_SIGN_SHA256		0x40000000UL
 
 /* compatibilty for Win beta version */
 #define IPMSG_RC2_40OLD			0x00000010UL	// for beta1-4 only
@@ -104,7 +111,7 @@
 #define IPMSG_BLOWFISH_256OBSOL	0x00040000UL
 #define IPMSG_AES_128OBSOLETE	0x00080000UL
 #define IPMSG_SIGN_MD5OBSOLETE	0x10000000UL
-#define IPMSG_UNAMEEXTOPTOBSOLT	0x02000000UL
+#define IPMSG_UNAMEEXTOPT_OBSLT	0x02000000UL
 
 /* file types for fileattach command */
 #define IPMSG_FILE_REGULAR		0x00000001UL
@@ -149,10 +156,31 @@
 
 #define IPMSG_DEFAULT_MULTICAST_ADDR6	"ff15::979"
 #define LINK_MULTICAST_ADDR6			"ff02::1"
+#define IPMSG_LIMITED_BROADCAST			"255.255.255.255"
+
 //#define IPMSG_MULTICAST_ADDR4	"224.9.7.9"
 
+#ifdef _WIN64
+#define IPMSG_VER_WIN_TYPE		IPMSG_VER_WIN64_TYPE
+#else
+#define IPMSG_VER_WIN_TYPE		IPMSG_VER_WIN32_TYPE
+#endif
+
+#define IPMSG_VER_WIN32_TYPE	0x00010001
+#define IPMSG_VER_WIN64_TYPE	0x00010002
+#define IPMSG_VER_MAC_TYPE		0x00020000
+#define IPMSG_VER_IOS_TYPE		0x00030000
+#define IPMSG_VER_ANDROID_TYPE	0x00040000
+
 /*  end of IP Messenger Communication Protocol version 3.0 define  */
+
+#ifdef USE_SERVER
+#define IPMSG_HEAD
+#include "ipmsgext.dat"
+#undef  IPMSG_HEAD
+#endif
 
 #include "ipmsgcmn.h"
 
 #endif
+

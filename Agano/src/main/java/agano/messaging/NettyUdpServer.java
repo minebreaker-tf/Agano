@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 public final class NettyUdpServer {
@@ -50,8 +49,7 @@ public final class NettyUdpServer {
                     protected void channelRead0(ChannelHandlerContext context, DatagramPacket packet) throws Exception {
                         logger.debug("Received packet: {}", packet);
 
-                        // Discard packets from self.
-                        if (packet.sender().getAddress().equals(InetAddress.getLocalHost())) return;
+                        if (packet.sender().getAddress().equals(InetAddress.getLocalHost())) return; // TODO Localhost判定が変
 
                         String messageStr = packet.content().toString(Charsets.shiftJIS());
                         try {
@@ -77,15 +75,13 @@ public final class NettyUdpServer {
     }
 
     public ChannelFuture submit(Message message, InetSocketAddress destination) {
-        ByteBuffer buf = message.asByte();
-        buf.flip();
-        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(buf).retain(), destination);
+        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message.toString(), Charsets.shiftJIS()), destination);
         logger.debug("Sending packet: {}", packet);
         return channel.writeAndFlush(packet);
     }
 
     public ChannelFuture submit(String message, Charset encoding, InetSocketAddress destination) {
-        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message, encoding).retain(), destination);
+        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message, encoding), destination);
         logger.debug("Sending packet: {}", packet);
         return channel.writeAndFlush(packet);
     }

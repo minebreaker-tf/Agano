@@ -1,14 +1,11 @@
 package agano.ipmsg;
 
-import agano.util.Charsets;
 import agano.util.Constants;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 
 import javax.annotation.Nonnull;
-import java.nio.ByteBuffer;
 
-import static agano.util.StringUtils.stringToByteBuffer;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -50,11 +47,6 @@ public class Message {
         this.port = port;
     }
 
-    @Nonnull
-    public ByteBuffer asByte() {
-        return stringToByteBuffer(this.toString(), Charsets.shiftJIS());
-    }
-
     /**
      * パケットの一意性は、「パケット番号：IPアドレス：ソースポート」で判断されます。
      * …ソースポートってなんだ
@@ -85,7 +77,7 @@ public class Message {
      */
     @Override
     public String toString() {
-        return Joiner.on(":")
+        return Joiner.on(":") // TODO Java8
                      .join(Constants.protocolVersion, packetNumber, user, host, operation, load);
     }
 
