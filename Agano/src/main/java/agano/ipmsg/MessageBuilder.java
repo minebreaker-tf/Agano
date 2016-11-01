@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,10 +29,19 @@ public final class MessageBuilder {
         return new Message(version, packetNumber, user, host, operation.getCode(), load, port);
     }
 
+    private static AtomicLong last = new AtomicLong();
+
+    private long generatePacketNumber() {
+        long val = System.currentTimeMillis() / 1000;  // IPmsgに桁数をあわせる
+        return last.updateAndGet(n -> n != val ? val : n + 1); // TODO 値がアプリ全体を通して重複しないようにする。そのうちもっといい実装に変更。
+        // 実際には同期のパフォーマンスのせいで勝手にずれてくれるorz
+        // 番号は時間である必要がないから、単純なインクリメントにするのがベストかも
+    }
+
     @Nonnull
     public MessageBuilder setUp(@Nonnull Operation operation, @Nonnull String load) {
         this.version = Constants.protocolVersion;
-        this.packetNumber = System.currentTimeMillis();
+        this.packetNumber = generatePacketNumber();
         this.user = "default-user"; // TODO
         try {
             this.host = InetAddress.getLocalHost().getHostName();
@@ -48,7 +58,7 @@ public final class MessageBuilder {
 
     @Nonnull
     public MessageBuilder setUp(@Nonnull Command command, @Nonnull String load) {
-        return setUp(OperationBuilder.of(command).build(), load);
+        return setUp(OperationBuilder.ofDefault(command).build(), load);
     }
 
     @Nonnull

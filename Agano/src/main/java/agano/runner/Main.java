@@ -14,7 +14,6 @@ import agano.util.Constants;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +25,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import static agano.ipmsg.Command.IPMSG_BR_ENTRY;
-import static agano.ipmsg.Command.IPMSG_BR_EXIT;
-import static agano.ipmsg.Command.IPMSG_NOOPERATION;
+import static agano.ipmsg.Command.*;
 
 @Singleton
 public final class Main {
@@ -45,8 +42,8 @@ public final class Main {
 
         setLaf();
 
-        Injector injector = Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule());
-        Main application = injector.getInstance(Main.class);
+        Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule())
+             .getInstance(Main.class);
     }
 
     @Inject
@@ -58,7 +55,7 @@ public final class Main {
             ServerManager serverManager) {
 
         this.udpServer = serverManager.getUdpServer();
-        this.form = formFactory.newInstance(this::shutdown);
+        this.form = formFactory.newInstance(this::shutdown, this);
         prepareWindow(form);
         stateManager.register(form);
 
@@ -66,11 +63,18 @@ public final class Main {
 
         /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
         udpServer.submit(
-                new MessageBuilder().setUp(IPMSG_NOOPERATION, "").build(),
+                new MessageBuilder().setUp(IPMSG_NOOPERATION, "default-user").build(),
                 new InetSocketAddress("192.168.0.255", Constants.defaultPort) // TODO ブロードキャストアドレス
         );
         udpServer.submit(
-                new MessageBuilder().setUp(OperationBuilder.of(IPMSG_BR_ENTRY).build(), "").build(),
+                new MessageBuilder().setUp(
+                        OperationBuilder.of(IPMSG_BR_ENTRY)
+//                                        .add(Option.IPMSG_CAPUTF8OPT)
+//                                        .add(Option.IPMSG_ENCRYPTOPT)
+                                        .build(),
+                        ""
+//                        "default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"
+                ).build(),
                 new InetSocketAddress("192.168.0.255", Constants.defaultPort)
         );
 

@@ -1,5 +1,6 @@
 package agano.runner.swing;
 
+import agano.runner.Main;
 import agano.runner.state.State;
 import agano.util.Constants;
 import com.google.inject.Inject;
@@ -15,17 +16,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class MainForm implements Observer<State> {
 
+    private final Main referenceHolder;
+
     private final JFrame frame;
     private final JSplitPane splitPane;
     private final UserList userList;
     private final ChatPane chatPane;
 
     public interface Factory {
-        public MainForm newInstance(Consumer<WindowEvent> callback);
+        public MainForm newInstance(Consumer<WindowEvent> callback, Main app);
     }
 
     @Inject
-    public MainForm(UserList userList, ChatPane chatPane, @Assisted Consumer<WindowEvent> callback) {
+    public MainForm(UserList userList, ChatPane chatPane, @Assisted Consumer<WindowEvent> callback, @Assisted Main application) {
+
+        this.referenceHolder = application;
 
         frame = new JFrame();
         frame.setTitle(Constants.title);

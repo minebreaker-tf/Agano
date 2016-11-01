@@ -7,6 +7,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class OperationBuilder {
 
+    private static final EnumSet<Option> defaultOperations = EnumSet.of(Option.IPMSG_CAPUTF8OPT);
+
     private Command command;
     private EnumSet<Option> operations;
 
@@ -19,6 +21,14 @@ public final class OperationBuilder {
     public static OperationBuilder of(@Nonnull Command command) {
         checkNotNull(command);
         return new OperationBuilder(command);
+    }
+
+    @Nonnull
+    public static OperationBuilder ofDefault(@Nonnull Command command) {
+        checkNotNull(command);
+        OperationBuilder builder = new OperationBuilder(command);
+        builder.operations.addAll(defaultOperations);
+        return builder;
     }
 
     @Nonnull

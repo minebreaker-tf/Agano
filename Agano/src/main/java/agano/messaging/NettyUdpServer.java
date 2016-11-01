@@ -5,7 +5,6 @@ import agano.ipmsg.Message;
 import agano.ipmsg.MessageFactory;
 import agano.runner.parameter.MessageReceivedParameter;
 import agano.util.AganoException;
-import agano.util.Charsets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public final class NettyUdpServer {
 
@@ -51,9 +51,9 @@ public final class NettyUdpServer {
 
                         if (packet.sender().getAddress().equals(InetAddress.getLocalHost())) return; // TODO Localhost判定が変
 
-                        String messageStr = packet.content().toString(Charsets.shiftJIS());
+                        String messageStr = packet.content().toString(StandardCharsets.UTF_8);
+                        Message message = MessageFactory.fromString(messageStr, packet.recipient().getPort());
                         try {
-                            Message message = MessageFactory.fromString(messageStr, packet.recipient().getPort());
                             eventBus.post(new MessageReceivedParameter(message));
                         } catch (MalformedMessageException e) {
                             logger.info("Uninterpretable message", e);
@@ -75,13 +75,16 @@ public final class NettyUdpServer {
     }
 
     public ChannelFuture submit(Message message, InetSocketAddress destination) {
-        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message.toString(), Charsets.shiftJIS()), destination);
-        logger.debug("Sending packet: {}", packet);
-        return channel.writeAndFlush(packet);
+        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message.toString(), StandardCharsets.UTF_8), destination);
+        return submit(packet, destination);
     }
 
     public ChannelFuture submit(String message, Charset encoding, InetSocketAddress destination) {
         DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message, encoding), destination);
+        return submit(packet, destination);
+    }
+
+    private ChannelFuture submit(DatagramPacket packet, InetSocketAddress destination) {
         logger.debug("Sending packet: {}", packet);
         return channel.writeAndFlush(packet);
     }

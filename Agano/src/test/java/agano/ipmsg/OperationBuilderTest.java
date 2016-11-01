@@ -9,7 +9,7 @@ public class OperationBuilderTest {
 
     @Test
     public void test() {
-        Operation op = OperationBuilder.of(Command.IPMSG_NOOPERATION)
+        Operation op = OperationBuilder.ofDefault(Command.IPMSG_NOOPERATION)
                                        .add(Option.IPMSG_SENDCHECKOPT)
                                        .build();
 

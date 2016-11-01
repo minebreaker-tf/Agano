@@ -47,6 +47,23 @@ public class Message {
         this.port = port;
     }
 
+    public Message(
+            @Nonnull String version,
+            long packetNumber,
+            @Nonnull String user,
+            @Nonnull String host,
+            @Nonnull Operation command,
+            @Nonnull String load,
+            int port) {
+        this.version = checkNotNull(version);
+        this.packetNumber = packetNumber;
+        this.user = checkNotNull(user);
+        this.host = checkNotNull(host);
+        this.operation = checkNotNull(command);
+        this.load = checkNotNull(load);
+        this.port = port;
+    }
+
     /**
      * パケットの一意性は、「パケット番号：IPアドレス：ソースポート」で判断されます。
      * …ソースポートってなんだ

@@ -1,10 +1,10 @@
 package agano.ipmsg;
 
-import agano.util.Charsets;
 import com.google.common.base.Splitter;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static agano.util.StringUtils.byteToString;
@@ -15,12 +15,14 @@ public final class MessageFactory {
 
     private MessageFactory() {}
 
+    // TODO 文字コード判定できるメソッドに書き直さないと
+    @Deprecated
     @Nonnull
     public static Message fromByte(@Nonnull ByteBuffer originalMessage, int port) {
 
         checkNotNull(originalMessage);
 
-        String converted = byteToString(originalMessage, Charsets.shiftJIS());
+        String converted = byteToString(originalMessage, StandardCharsets.UTF_8);
 
         return fromString(converted, port);
     }

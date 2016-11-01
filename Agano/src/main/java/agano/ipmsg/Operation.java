@@ -26,12 +26,10 @@ public final class Operation {
         this.options = Option.find(code);
     }
 
-    Operation(Command command, EnumSet<Option> options) {
-        checkNotNull(command);
-        checkNotNull(options);
+    Operation(@Nonnull Command command, @Nonnull EnumSet<Option> options) {
 
-        this.command = command;
-        this.options = options.clone();
+        this.command = checkNotNull(command);
+        this.options = checkNotNull(options).clone();
 
         long code = command.getCode();
         for (Option op : options) {
@@ -56,8 +54,7 @@ public final class Operation {
     }
 
     public boolean isEnabledOption(@Nonnull Option option) {
-        checkNotNull(option);
-        return options.contains(option);
+        return options.contains(checkNotNull(option));
     }
 
     @Override
@@ -74,9 +71,9 @@ public final class Operation {
 
     public String explain() {
         return MoreObjects.toStringHelper(this)
-                .add("Command", command)
-                .add("Options", options)
-                .toString();
+                          .add("Command", command)
+                          .add("Options", options)
+                          .toString();
     }
 
 }
