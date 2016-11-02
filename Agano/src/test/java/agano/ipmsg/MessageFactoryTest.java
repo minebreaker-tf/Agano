@@ -1,10 +1,10 @@
 package agano.ipmsg;
 
-import agano.util.Charsets;
 import agano.util.StringUtils;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -14,7 +14,7 @@ public class MessageFactoryTest {
     @Test
     public void test() {
         String original = "1:123:user:host:00000001:積み荷1:積み荷2";
-        ByteBuffer buf = StringUtils.stringToByteBuffer(original, Charsets.shiftJIS());
+        ByteBuffer buf = StringUtils.stringToByteBuffer(original, StandardCharsets.UTF_8);
         buf.flip();
 
         Message message = MessageFactory.fromByte(buf, 2425);
