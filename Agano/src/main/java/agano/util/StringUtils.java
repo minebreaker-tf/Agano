@@ -30,6 +30,7 @@ public final class StringUtils {
      * @param charset
      * @return
      */
+    @Deprecated
     public static ByteBuffer stringToByteBuffer(String string, Charset charset) {
         byte[] bytes = stringToByte(string, charset);
         ByteBuffer buf = ByteBuffer.allocate(bytes.length);

@@ -2,11 +2,13 @@ package agano.runner;
 
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.OperationBuilder;
-import agano.libraries.guice.EventBusModule;
+import agano.libraries.guava.EventBusModule;
 import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
 import agano.runner.controller.Controller;
+import agano.runner.controller.ReceiveMessageController;
+import agano.runner.controller.SendMessageController;
 import agano.runner.state.StateManager;
 import agano.runner.swing.MainForm;
 import agano.runner.swing.SwingModule;
@@ -52,14 +54,19 @@ public final class Main {
             EventBus eventBus,
             StateManager stateManager,
             Controller controller,
+            ReceiveMessageController receiveMessageController,
+            SendMessageController sendMessageController,
             ServerManager serverManager) {
 
         this.udpServer = serverManager.getUdpServer();
-        this.form = formFactory.newInstance(this::shutdown, this);
+        this.form = formFactory.newInstance(this::shutdown);
+
         prepareWindow(form);
         stateManager.register(form);
 
         eventBus.register(controller);
+        eventBus.register(receiveMessageController);
+        eventBus.register(sendMessageController);
 
         /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
         udpServer.submit(
@@ -68,12 +75,9 @@ public final class Main {
         );
         udpServer.submit(
                 new MessageBuilder().setUp(
-                        OperationBuilder.of(IPMSG_BR_ENTRY)
-//                                        .add(Option.IPMSG_CAPUTF8OPT)
-//                                        .add(Option.IPMSG_ENCRYPTOPT)
+                        OperationBuilder.ofDefault(IPMSG_BR_ENTRY)
                                         .build(),
                         ""
-//                        "default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"
                 ).build(),
                 new InetSocketAddress("192.168.0.255", Constants.defaultPort)
         );

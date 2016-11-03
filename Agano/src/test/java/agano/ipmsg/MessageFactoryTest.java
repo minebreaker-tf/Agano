@@ -12,7 +12,21 @@ import static org.junit.Assert.assertThat;
 public class MessageFactoryTest {
 
     @Test
-    public void test() {
+    public void testFromString() {
+        String original = "1:123:user:host:00000001:積み荷1:積み荷2";
+        Message message = MessageFactory.fromString(original, 2425);
+
+        assertThat(message.getVersion(), is("1"));
+        assertThat(message.getPacketNumber(), is(123L));
+        assertThat(message.getUser(), is("user"));
+        assertThat(message.getHost(), is("host"));
+        assertThat(message.getOperation().getCode(), is(1L));
+        assertThat(message.getLoad(), is("積み荷1:積み荷2"));
+        assertThat(message.getPort(), is(2425));
+    }
+
+    @Test
+    public void testFromByte() {
         String original = "1:123:user:host:00000001:積み荷1:積み荷2";
         ByteBuffer buf = StringUtils.stringToByteBuffer(original, StandardCharsets.UTF_8);
         buf.flip();

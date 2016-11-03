@@ -6,6 +6,10 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 public class SwingModule extends AbstractModule {
 
     protected void configure() {
+        bind(UserList.class).to(UserListImpl.class);
+        bind(ChatPane.class).to(ChatPaneImpl.class);
+        bind(ChatTextInput.class).to(ChatTextInputImpl.class);
+        bind(ChatTextView.class).to(ChatTextViewImpl.class);
         install(new FactoryModuleBuilder()
                         .implement(MainForm.class, MainForm.class)
                         .build(MainForm.Factory.class));

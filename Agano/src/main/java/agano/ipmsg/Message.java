@@ -6,12 +6,14 @@ import com.google.common.base.MoreObjects;
 
 import javax.annotation.Nonnull;
 
+import java.util.Objects;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * 送受信に使われるメッセージを表す
+ * 送受信に使われるメッセージを表すクラスです.
  */
-public class Message {
+public final class Message {
 
     private final String version;
     private final long packetNumber;
@@ -38,13 +40,7 @@ public class Message {
             long command,
             @Nonnull String load,
             int port) {
-        this.version = checkNotNull(version);
-        this.packetNumber = packetNumber;
-        this.user = checkNotNull(user);
-        this.host = checkNotNull(host);
-        this.operation = checkNotNull(new Operation(command));
-        this.load = checkNotNull(load);
-        this.port = port;
+        this(version, packetNumber, user, host, new Operation(command), load, port);
     }
 
     public Message(
@@ -65,36 +61,39 @@ public class Message {
     }
 
     /**
-     * パケットの一意性は、「パケット番号：IPアドレス：ソースポート」で判断されます。
-     * …ソースポートってなんだ
+     * {@inheritDoc}
      *
      * @return ハッシュコード
      */
     @Override
     public int hashCode() {
-        return (int) (packetNumber >> 16) ^ (int) (packetNumber) + port; // TODO 実装が微妙なので要修正
-    }
-
-    // TODO: 実装が正しいか後で確認
-    @Override
-    public boolean equals(Object object) {
-        return object != null && // TODO: GuavaのChainで置き換え
-               object instanceof Message &&
-               ((Message) object).getPacketNumber() == this.getPacketNumber() &&
-               ((Message) object).getHost()
-                                 .equals(this.getHost()) &&
-               ((Message) object).getPort() == this.getPort();
+        return Objects.hash(packetNumber, port, host);
     }
 
     /**
-     * メッセージをそのまま送信できる形でString化します。
-     * (i.e. getByte()でそのまま送信できます)
+     * Messageクラスの等価性はパケット・ホスト・ポート[のみ]によって判断されます.
+     * オペレーションや積み荷が異なっていても、等かと判断されるので注意してください.
+     * この実装はIP Messengerの仕様です.
+     *
+     * @param other 比較対象
+     * @return 比較結果
+     */
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof Message &&
+               this.packetNumber == ((Message) other).packetNumber &&
+               this.host.equals(((Message) other).host) &&
+               this.port == ((Message) other).port;
+    }
+
+    /**
+     * メッセージをそのまま送信できる形でString化します.
      *
      * @return このメッセージのString表現
      */
     @Override
     public String toString() {
-        return Joiner.on(":") // TODO Java8
+        return Joiner.on(":")
                      .join(Constants.protocolVersion, packetNumber, user, host, operation, load);
     }
 
@@ -129,6 +128,7 @@ public class Message {
         return host;
     }
 
+    @Nonnull
     public Operation getOperation() {
         return operation;
     }

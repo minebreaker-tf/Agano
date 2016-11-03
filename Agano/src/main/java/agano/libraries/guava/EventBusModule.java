@@ -1,4 +1,4 @@
-package agano.libraries.guice;
+package agano.libraries.guava;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
