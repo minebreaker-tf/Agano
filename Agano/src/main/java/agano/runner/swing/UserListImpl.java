@@ -1,5 +1,6 @@
 package agano.runner.swing;
 
+import agano.config.Config;
 import agano.runner.parameter.SelectionParameter;
 import agano.runner.state.User;
 import com.google.common.eventbus.EventBus;
@@ -18,13 +19,14 @@ public final class UserListImpl implements UserList {
     private final DefaultListModel<User> model;
 
     @Inject
-    public UserListImpl(EventBus eventBus) {
+    public UserListImpl(EventBus eventBus, Config config) {
 
         scrollPane = new JScrollPane();
 
         model = new DefaultListModel<>();
 
         list = new JList<>(model);
+        list.setFont(config.getFont());
         list.setBorder(BorderFactory.createEmptyBorder());
         list.addListSelectionListener(e -> {
             User selected = model.get(e.getFirstIndex());

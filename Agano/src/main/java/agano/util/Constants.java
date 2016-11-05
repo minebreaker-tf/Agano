@@ -10,11 +10,11 @@ public final class Constants {
 
     public static final String protocolVersion = "1";
 
-    public static final Path configPath = Paths.get("../conf/agano.conf");
+    public static final Path configPath = Paths.get("./conf/agano.conf");
 
     public static final String defaultLaf = "com.bulenkov.darcula.DarculaLaf";
-    //    public static final String defaultFont = "/agano/font/mplus-1c-light.ttf";
-    public static final String defaultFont = "/agano/font/SourceHanSansJP-Light.otf";
+    public static final String defaultFont = "/agano/font/mplus-1c-light.ttf";
+//    public static final String defaultFont = "/agano/font/NotoSansCJKjp-Light.otf"; // OpenTypeに対応しているはずなのにうまく読めないorz
     public static final int defaultFontSize = 16;
 
     public static final String title = "Agano";

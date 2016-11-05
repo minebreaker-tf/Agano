@@ -1,10 +1,10 @@
 package agano.runner;
 
+import agano.config.Config;
 import agano.config.ConfigModule;
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.OperationBuilder;
 import agano.libraries.guava.EventBusModule;
-import agano.util.NetHelper;
 import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
@@ -15,6 +15,7 @@ import agano.runner.state.StateManager;
 import agano.runner.swing.MainForm;
 import agano.runner.swing.SwingModule;
 import agano.util.Constants;
+import agano.util.NetHelper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -24,9 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import static agano.ipmsg.Command.*;
@@ -39,6 +38,7 @@ public final class Main {
     private final MainForm form;
     private final NettyUdpServer udpServer;
     private final NetHelper netHelper;
+    private final Config config;
 
     public static void main(String[] args) {
 
@@ -60,13 +60,14 @@ public final class Main {
             ReceiveMessageController receiveMessageController,
             SendMessageController sendMessageController,
             ServerManager serverManager,
-            NetHelper netHelper) {
+            NetHelper netHelper,
+            Config config) {
 
         this.form = formFactory.newInstance(this::shutdown);
         this.udpServer = serverManager.getUdpServer();
         this.netHelper = netHelper;
+        this.config = config;
 
-        prepareWindow(form);
         stateManager.register(form);
 
         eventBus.register(controller);
@@ -76,7 +77,7 @@ public final class Main {
         /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
         udpServer.submit(
                 new MessageBuilder().setUp(IPMSG_NOOPERATION, "default-user").build(),
-                new InetSocketAddress(netHelper.broadcastAddress(), Constants.defaultPort) // TODO ブロードキャストアドレス
+                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort()) // TODO ブロードキャストアドレス
         );
         udpServer.submit(
                 new MessageBuilder().setUp(
@@ -84,7 +85,7 @@ public final class Main {
                                         .build(),
                         ""
                 ).build(),
-                new InetSocketAddress(netHelper.broadcastAddress(), Constants.defaultPort)
+                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
         );
 
     }
@@ -92,7 +93,7 @@ public final class Main {
     private void shutdown(WindowEvent event) {
         udpServer.submit(
                 new MessageBuilder().setUp(IPMSG_BR_EXIT, "").build(),
-                new InetSocketAddress(netHelper.broadcastAddress(), Constants.defaultPort)
+                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
         );
         try {
             udpServer.shutdown().sync();
@@ -109,22 +110,6 @@ public final class Main {
         } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
             logger.warn("Failed to set laf.", e);
         }
-    }
-
-    // TODO Config
-    private static MainForm prepareWindow(MainForm form) {
-        try {
-            Font defaultFont = Font.createFont(
-                    Font.TRUETYPE_FONT,
-                    Main.class.getResourceAsStream(Constants.defaultFont)
-            );
-            defaultFont = defaultFont.deriveFont(Font.PLAIN, Constants.defaultFontSize);
-
-        } catch (FontFormatException | IOException e) {
-            logger.warn("Failed to load font.", e);
-        }
-
-        return form;
     }
 
 }

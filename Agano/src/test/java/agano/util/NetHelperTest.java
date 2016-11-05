@@ -1,9 +1,7 @@
 package agano.util;
 
-import agano.config.Config;
-import com.google.inject.AbstractModule;
+import agano.config.ConfigModuleForTest;
 import com.google.inject.Guice;
-import com.google.inject.Provides;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,17 +22,7 @@ public class NetHelperTest {
 
     @Before
     public void setUp() {
-        netHelper = Guice.createInjector(new TestConfigModule()).getInstance(NetHelper.class);
-    }
-
-    private static class TestConfigModule extends AbstractModule {
-        @Override
-        protected void configure() {}
-
-        @Provides
-        public Config provideConfig() {
-            return new Config(null);
-        }
+        netHelper = Guice.createInjector(new ConfigModuleForTest()).getInstance(NetHelper.class);
     }
 
     @Ignore

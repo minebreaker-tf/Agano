@@ -32,6 +32,7 @@ public final class MessageBuilder {
         // 番号は時間である必要がないから、単純なインクリメントにするのがベストかも
     }
 
+    // TODO Config化
     @Nonnull
     public MessageBuilder setUp(@Nonnull Operation operation, @Nonnull String load) {
         this.version = Constants.protocolVersion;

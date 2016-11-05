@@ -1,5 +1,6 @@
 package agano.runner.swing;
 
+import agano.config.Config;
 import agano.runner.parameter.SendMessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
@@ -14,14 +15,14 @@ public final class ChatTextInputImpl implements ChatTextInput {
     private final JTextArea textArea;
 
     @Inject
-    public ChatTextInputImpl(EventBus eventBus) {
+    public ChatTextInputImpl(EventBus eventBus, Config config) {
 
         this.eventBus = eventBus;
 
         scrollPane = new JScrollPane();
 
         textArea = new JTextArea();
-
+        textArea.setFont(config.getFont());
         textArea.setLineWrap(true);
         textArea.getInputMap().put(KeyStroke.getKeyStroke("shift ENTER"), "insert-break");
         textArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "submit-message");

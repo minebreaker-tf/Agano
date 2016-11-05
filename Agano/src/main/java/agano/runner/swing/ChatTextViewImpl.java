@@ -1,5 +1,6 @@
 package agano.runner.swing;
 
+import agano.config.Config;
 import agano.runner.state.State;
 import agano.runner.state.User;
 import com.google.inject.Inject;
@@ -19,10 +20,11 @@ public final class ChatTextViewImpl implements ChatTextView {
     private final JTextPane chatText;
 
     @Inject
-    public ChatTextViewImpl() {
+    public ChatTextViewImpl(Config config) {
         base = new JPanel();
 
         chatText = new JTextPane();
+        chatText.setFont(config.getFont());
         chatText.setBorder(BorderFactory.createEmptyBorder());
 //        chatText.setMargin(new Insets(0, 0, 0, 0));
         chatText.setEditable(false);
@@ -40,10 +42,8 @@ public final class ChatTextViewImpl implements ChatTextView {
     @Override
     public void update(@Nonnull State state) {
         Optional<User> selected = state.getSelectedUser();
-        System.out.println(selected);
         if (selected.isPresent()) {
             User user = selected.get();
-            System.out.println(user.getTalks());
             String talks = user.getTalks().stream()
                                .map(msg -> "[" + now() + " - " + msg.getUser() + " ] " + msg.getLoad())
                                .collect(joining("\n"));
