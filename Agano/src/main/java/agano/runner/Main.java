@@ -26,6 +26,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.swing.*;
 import java.awt.event.WindowEvent;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 
 import static agano.ipmsg.Command.*;
@@ -41,14 +42,28 @@ public final class Main {
     private final Config config;
 
     public static void main(String[] args) {
+        try {
 
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
 
-        setLaf();
+            setLaf();
 
-        Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule(), new ConfigModule())
-             .getInstance(Main.class);
+            Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule(), new ConfigModule())
+                 .getInstance(Main.class);
+
+        } catch (Throwable t) {
+            logger.error("Fatal error had occurred.", t);
+            if (t.getCause() instanceof BindException) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Failed to bind the socket.\nMaybe the port is already used by an another application.",
+                        "Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
+            System.exit(-1);
+        }
     }
 
     @Inject
@@ -77,7 +92,7 @@ public final class Main {
         /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
         udpServer.submit(
                 new MessageBuilder().setUp(IPMSG_NOOPERATION, "default-user").build(),
-                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort()) // TODO ブロードキャストアドレス
+                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
         );
         udpServer.submit(
                 new MessageBuilder().setUp(

@@ -35,7 +35,6 @@ public final class ReceiveMessageController {
         this.serverManager = serverManager;
     }
 
-    // TODO コントローラー分割
     @Subscribe
     public void receiveMessage(MessageReceivedParameter parameter) {
         logger.debug("Received: {}", parameter.getMessage().explain());

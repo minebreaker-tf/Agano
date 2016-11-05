@@ -4,7 +4,6 @@ import agano.ipmsg.MalformedMessageException;
 import agano.ipmsg.Message;
 import agano.ipmsg.MessageFactory;
 import agano.runner.parameter.MessageReceivedParameter;
-import agano.util.AganoException;
 import agano.util.NetHelper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
@@ -19,9 +18,12 @@ import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class NettyUdpServer {
 
@@ -66,25 +68,26 @@ public final class NettyUdpServer {
                     }
 
                 });
-        try {
-            this.channel = bootstrap.bind(port).sync().channel();
-        } catch (InterruptedException e) {
-            throw new AganoException(e);
-        }
-
+        this.channel = bootstrap.bind(port).syncUninterruptibly().channel();
     }
 
-    public ChannelFuture submit(Message message, InetSocketAddress destination) {
-        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message.toString(), StandardCharsets.UTF_8), destination);
-        return submit(packet, destination);
+    public ChannelFuture submit(@Nonnull Message message, @Nonnull InetSocketAddress destination) {
+        DatagramPacket packet = new DatagramPacket(
+                Unpooled.copiedBuffer(checkNotNull(message).toString(), StandardCharsets.UTF_8),
+                checkNotNull(destination)
+        );
+        return submit(packet);
     }
 
-    public ChannelFuture submit(String message, Charset encoding, InetSocketAddress destination) {
-        DatagramPacket packet = new DatagramPacket(Unpooled.copiedBuffer(message, encoding), destination);
-        return submit(packet, destination);
+    public ChannelFuture submit(@Nonnull String message, @Nonnull Charset encoding, @Nonnull InetSocketAddress destination) {
+        DatagramPacket packet = new DatagramPacket(
+                Unpooled.copiedBuffer(checkNotNull(message), checkNotNull(encoding)),
+                checkNotNull(destination)
+        );
+        return submit(packet);
     }
 
-    private ChannelFuture submit(DatagramPacket packet, InetSocketAddress destination) {
+    private ChannelFuture submit(DatagramPacket packet) {
         logger.debug("Sending packet: {}", packet);
         return channel.writeAndFlush(packet);
     }
