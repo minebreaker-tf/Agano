@@ -45,11 +45,16 @@ public final class UserListImpl implements UserList {
     }
 
     @Override
-    public synchronized void update(@Nonnull List<User> element) {
-        for (int i = 0; i < element.size(); i++) {
-            if (model.get(i) != element.get(i)) {
-                model.set(i, element.get(i));
+    public synchronized void update(@Nonnull List<User> state) {
+        if (model.size() == state.size()) {
+            for (int i = 0; i < state.size(); i++) {
+                if (model.get(i) != state.get(i)) {
+                    model.set(i, state.get(i));
+                }
             }
+        } else {
+            model.removeAllElements();
+            state.forEach(model::addElement);
         }
     }
 

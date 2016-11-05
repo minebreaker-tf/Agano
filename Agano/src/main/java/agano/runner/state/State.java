@@ -89,7 +89,14 @@ public final class State {
         State newState = copy();
         ImmutableList.Builder<User> builder = ImmutableList.builder();
         for (User each : users) {
-            builder.add(each.equals(toWhom) ? each.addTalk(message) : each);
+            if (each.equals(toWhom)) {
+                User userTalkAdded = each.addTalk(message);
+                if (selected.isPresent() && each.equals(selected.get()))
+                    newState.selected = Optional.of(userTalkAdded);
+                builder.add(userTalkAdded);
+            } else {
+                builder.add(each);
+            }
         }
         newState.users = builder.build();
 

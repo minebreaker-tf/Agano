@@ -33,8 +33,6 @@ public final class ChatTextInputImpl implements ChatTextInput {
             }
         });
 
-        textArea.setText("mock input");
-
         scrollPane.getViewport().setView(textArea);
 
         scrollPane.setBorder(BorderFactory.createEmptyBorder());

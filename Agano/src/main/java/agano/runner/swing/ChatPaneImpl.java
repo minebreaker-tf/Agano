@@ -33,8 +33,8 @@ public final class ChatPaneImpl implements ChatPane {
     }
 
     @Override
-    public void update(@Nonnull State element) {
-
+    public void update(@Nonnull State state) {
+        chatView.update(state);
     }
 
     @Override

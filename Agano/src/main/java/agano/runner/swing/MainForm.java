@@ -60,8 +60,7 @@ public final class MainForm implements Observer<State> {
         checkNotNull(state);
 
         userList.update(state.getUsers());
-        // TODO
-
+        chatPane.update(state);
     }
 
 }

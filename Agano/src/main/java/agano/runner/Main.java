@@ -1,8 +1,10 @@
 package agano.runner;
 
+import agano.config.ConfigModule;
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.OperationBuilder;
 import agano.libraries.guava.EventBusModule;
+import agano.util.NetHelper;
 import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
@@ -36,6 +38,7 @@ public final class Main {
 
     private final MainForm form;
     private final NettyUdpServer udpServer;
+    private final NetHelper netHelper;
 
     public static void main(String[] args) {
 
@@ -44,7 +47,7 @@ public final class Main {
 
         setLaf();
 
-        Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule())
+        Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule(), new ConfigModule())
              .getInstance(Main.class);
     }
 
@@ -56,10 +59,12 @@ public final class Main {
             Controller controller,
             ReceiveMessageController receiveMessageController,
             SendMessageController sendMessageController,
-            ServerManager serverManager) {
+            ServerManager serverManager,
+            NetHelper netHelper) {
 
-        this.udpServer = serverManager.getUdpServer();
         this.form = formFactory.newInstance(this::shutdown);
+        this.udpServer = serverManager.getUdpServer();
+        this.netHelper = netHelper;
 
         prepareWindow(form);
         stateManager.register(form);
@@ -71,7 +76,7 @@ public final class Main {
         /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
         udpServer.submit(
                 new MessageBuilder().setUp(IPMSG_NOOPERATION, "default-user").build(),
-                new InetSocketAddress("192.168.0.255", Constants.defaultPort) // TODO ブロードキャストアドレス
+                new InetSocketAddress(netHelper.broadcastAddress(), Constants.defaultPort) // TODO ブロードキャストアドレス
         );
         udpServer.submit(
                 new MessageBuilder().setUp(
@@ -79,7 +84,7 @@ public final class Main {
                                         .build(),
                         ""
                 ).build(),
-                new InetSocketAddress("192.168.0.255", Constants.defaultPort)
+                new InetSocketAddress(netHelper.broadcastAddress(), Constants.defaultPort)
         );
 
     }
@@ -87,7 +92,7 @@ public final class Main {
     private void shutdown(WindowEvent event) {
         udpServer.submit(
                 new MessageBuilder().setUp(IPMSG_BR_EXIT, "").build(),
-                new InetSocketAddress("192.168.0.255", Constants.defaultPort)
+                new InetSocketAddress(netHelper.broadcastAddress(), Constants.defaultPort)
         );
         try {
             udpServer.shutdown().sync();
@@ -109,7 +114,6 @@ public final class Main {
     // TODO Config
     private static MainForm prepareWindow(MainForm form) {
         try {
-            // TODO Noto Sans
             Font defaultFont = Font.createFont(
                     Font.TRUETYPE_FONT,
                     Main.class.getResourceAsStream(Constants.defaultFont)

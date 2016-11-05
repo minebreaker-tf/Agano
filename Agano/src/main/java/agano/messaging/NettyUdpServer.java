@@ -5,6 +5,7 @@ import agano.ipmsg.Message;
 import agano.ipmsg.MessageFactory;
 import agano.runner.parameter.MessageReceivedParameter;
 import agano.util.AganoException;
+import agano.util.NetHelper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -18,7 +19,6 @@ import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -46,10 +46,10 @@ public final class NettyUdpServer {
                 .handler(new SimpleChannelInboundHandler<DatagramPacket>() {
 
                     @Override
-                    protected void channelRead0(ChannelHandlerContext context, DatagramPacket packet) throws Exception {
+                    protected void channelRead0(ChannelHandlerContext context, DatagramPacket packet) {
                         logger.debug("Received packet: {}", packet);
 
-                        if (packet.sender().getAddress().equals(InetAddress.getLocalHost())) return; // TODO Localhost判定が変
+                        if (packet.sender().getAddress().equals(NetHelper.localhost())) return; // TODO Localhost判定が変
 
                         String messageStr = packet.content().toString(StandardCharsets.UTF_8);
                         Message message = MessageFactory.fromString(messageStr, packet.recipient().getPort());

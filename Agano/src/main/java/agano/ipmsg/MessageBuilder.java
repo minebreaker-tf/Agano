@@ -1,20 +1,14 @@
 package agano.ipmsg;
 
-import agano.util.AganoException;
 import agano.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import agano.util.NetHelper;
 
 import javax.annotation.Nonnull;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class MessageBuilder {
-
-    private static final Logger logger = LoggerFactory.getLogger(MessageBuilder.class);
 
     private String version;
     private long packetNumber;
@@ -43,12 +37,7 @@ public final class MessageBuilder {
         this.version = Constants.protocolVersion;
         this.packetNumber = generatePacketNumber();
         this.user = "default-user"; // TODO
-        try {
-            this.host = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            logger.warn("Failed to detect local address.", e);
-            throw new AganoException(e);
-        }
+        this.host = NetHelper.localhost().getHostName();
         this.operation = checkNotNull(operation);
         this.load = checkNotNull(load);
         this.port = Constants.defaultPort;
