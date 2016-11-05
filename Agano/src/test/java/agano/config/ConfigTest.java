@@ -34,7 +34,7 @@ public class ConfigTest {
     @Test
     public void testFallbacking() {
         assertThat(confEmpty.getPort(), is(Constants.defaultPort));
-        assertThat(confEmpty.getFont().getFamily(), is("源ノ角ゴシック JP Light"));
+        assertThat(confEmpty.getFont().getFamily(), is("M+ 1c light"));
         assertThat(confEmpty.getFont().getSize(), is(Constants.defaultFontSize));
     }
 
