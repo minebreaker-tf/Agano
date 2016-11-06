@@ -47,7 +47,8 @@ public final class SendMessageController {
                 config,
                 OperationBuilder.ofDefault(IPMSG_SENDMSG)
                                 //.add(Option.IPMSG_NOADDLISTOPT)
-                                .add(Option.IPMSG_SENDCHECKOPT).build(),
+                                .add(Option.IPMSG_SENDCHECKOPT)
+                                .add(Option.IPMSG_UTF8OPT).build(),
                 parameter.getMessage()
         ).build();
 
