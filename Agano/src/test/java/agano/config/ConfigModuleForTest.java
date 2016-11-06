@@ -14,6 +14,7 @@ public class ConfigModuleForTest extends AbstractModule {
     @Provides
     public Config provideConfig() {
         return new Config(ConfigFactory.parseMap(ImmutableMap.of(
+                "user.name", "default",
                 "port", 62425,
                 "font.size", 10,
                 "font.name", Font.SANS_SERIF

@@ -18,11 +18,13 @@ public final class Config {
 
     private final int port;
     private final Font font;
+    private final String username;
 
     Config(com.typesafe.config.Config config) {
         this.raw = config;
         this.port = getInt("port").orElse(Constants.defaultPort);
         this.font = createFont();
+        this.username = createUsername();
     }
 
     private Optional<String> getString(String path) {
@@ -66,12 +68,24 @@ public final class Config {
         }
     }
 
+    private String createUsername() {
+        Optional<String> username = getString("user.name");
+        if (username.isPresent())
+            return username.get();
+        else
+            return System.getProperty("user.name");
+    }
+
     public int getPort() {
         return port;
     }
 
     public Font getFont() {
         return font;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
 }

@@ -1,6 +1,9 @@
 package agano.ipmsg;
 
+import agano.config.Config;
+import agano.config.ConfigModuleForTest;
 import agano.util.Constants;
+import com.google.inject.Guice;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,10 +46,12 @@ public class MessageBuilderTest {
 
     @Test
     public void testGracefulSetUp() throws UnknownHostException {
-        Message built = new MessageBuilder().setUp(new Operation(1), "load").build();
+        Config config = Guice.createInjector(new ConfigModuleForTest.Empty()).getInstance(Config.class);
+
+        Message built = new MessageBuilder().setUp(config, new Operation(1), "load").build();
 
         assertThat(built.getVersion(), is(Constants.protocolVersion));
-        assertThat(built.getUser(), is("default-user")); // TODO
+        assertThat(built.getUser(), is(System.getProperty("user.name"))); // TODO
         assertThat(built.getHost(), is(InetAddress.getLocalHost().getHostName()));
         assertThat(built.getOperation(), is(message.getOperation()));
         assertThat(built.getLoad(), is(message.getLoad()));

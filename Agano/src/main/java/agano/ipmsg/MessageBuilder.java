@@ -1,5 +1,6 @@
 package agano.ipmsg;
 
+import agano.config.Config;
 import agano.util.Constants;
 import agano.util.NetHelper;
 
@@ -32,23 +33,38 @@ public final class MessageBuilder {
         // 番号は時間である必要がないから、単純なインクリメントにするのがベストかも
     }
 
-    // TODO Config化
+    @Nonnull
+    public MessageBuilder setUp(@Nonnull Config config, @Nonnull Operation operation, @Nonnull String load) {
+        checkNotNull(config);
+
+        this.version = Constants.protocolVersion;
+        this.packetNumber = generatePacketNumber();
+        this.user = config.getUsername();
+        this.host = NetHelper.localhost().getHostName();
+        this.operation = checkNotNull(operation);
+        this.load = checkNotNull(load);
+        this.port = config.getPort();
+
+        return this;
+    }
+
+    @Nonnull
+    public MessageBuilder setUp(@Nonnull Config config, @Nonnull Command command, @Nonnull String load) {
+        return setUp(config, OperationBuilder.ofDefault(command).build(), load);
+    }
+
+    @Deprecated
     @Nonnull
     public MessageBuilder setUp(@Nonnull Operation operation, @Nonnull String load) {
         this.version = Constants.protocolVersion;
         this.packetNumber = generatePacketNumber();
-        this.user = "default-user"; // TODO
+        this.user = "default-user";
         this.host = NetHelper.localhost().getHostName();
         this.operation = checkNotNull(operation);
         this.load = checkNotNull(load);
         this.port = Constants.defaultPort;
 
         return this;
-    }
-
-    @Nonnull
-    public MessageBuilder setUp(@Nonnull Command command, @Nonnull String load) {
-        return setUp(OperationBuilder.ofDefault(command).build(), load);
     }
 
     @Nonnull

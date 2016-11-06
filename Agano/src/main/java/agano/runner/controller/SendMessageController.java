@@ -1,5 +1,6 @@
 package agano.runner.controller;
 
+import agano.config.Config;
 import agano.ipmsg.Message;
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.OperationBuilder;
@@ -25,11 +26,13 @@ public final class SendMessageController {
 
     private final StateManager stateManager;
     private final ServerManager serverManager;
+    private final Config config;
 
     @Inject
-    public SendMessageController(StateManager stateManager, ServerManager serverManager) {
+    public SendMessageController(StateManager stateManager, ServerManager serverManager, Config config) {
         this.stateManager = stateManager;
         this.serverManager = serverManager;
+        this.config = config;
     }
 
     @Subscribe
@@ -41,6 +44,7 @@ public final class SendMessageController {
         User user = selected.get();
 
         Message msg = new MessageBuilder().setUp(
+                config,
                 OperationBuilder.ofDefault(IPMSG_SENDMSG)
                                 //.add(Option.IPMSG_NOADDLISTOPT)
                                 .add(Option.IPMSG_SENDCHECKOPT).build(),

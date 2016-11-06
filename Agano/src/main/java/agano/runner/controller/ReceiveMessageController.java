@@ -1,5 +1,6 @@
 package agano.runner.controller;
 
+import agano.config.Config;
 import agano.ipmsg.Message;
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.Operation;
@@ -28,11 +29,13 @@ public final class ReceiveMessageController {
 
     private final StateManager stateManager;
     private final ServerManager serverManager;
+    private final Config config;
 
     @Inject
-    public ReceiveMessageController(StateManager stateManager, ServerManager serverManager) {
+    public ReceiveMessageController(StateManager stateManager, ServerManager serverManager, Config config) {
         this.stateManager = stateManager;
         this.serverManager = serverManager;
+        this.config = config;
     }
 
     @Subscribe
@@ -45,10 +48,11 @@ public final class ReceiveMessageController {
 
         User sender = addUser(received); // データを受信した時点で、相手を登録しておく
 
+        // TODO ストラテジー
         switch (op.getCommand()) {
         case IPMSG_BR_ENTRY:
             serverManager.getUdpServer().submit(
-                    new MessageBuilder().setUp(IPMSG_ANSENTRY, "").build(),
+                    new MessageBuilder().setUp(config, IPMSG_ANSENTRY, "").build(),
                     senderAddress
             );
             break;
@@ -71,7 +75,7 @@ public final class ReceiveMessageController {
         logger.info("Message received: {}", received.getLoad());
         if (received.getOperation().isEnabledOption(Option.IPMSG_SENDCHECKOPT)) {
             serverManager.getUdpServer().submit(
-                    new MessageBuilder().setUp(IPMSG_RECVMSG, "").build(),
+                    new MessageBuilder().setUp(config, IPMSG_RECVMSG, "").build(),
                     sender.getAddress()
             );
         }

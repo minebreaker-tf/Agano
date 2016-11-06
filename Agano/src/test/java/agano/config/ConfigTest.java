@@ -29,6 +29,8 @@ public class ConfigTest {
         assertThat(conf.getPort(), is(62425));
         assertThat(conf.getFont().getFamily(), is(Font.SANS_SERIF));
         assertThat(conf.getFont().getSize(), is(10));
+        assertThat(conf.getUsername(), is("default"));
+
     }
 
     @Test
@@ -36,6 +38,7 @@ public class ConfigTest {
         assertThat(confEmpty.getPort(), is(Constants.defaultPort));
         assertThat(confEmpty.getFont().getFamily(), is("M+ 1c light"));
         assertThat(confEmpty.getFont().getSize(), is(Constants.defaultFontSize));
+        assertThat(confEmpty.getUsername(), is(System.getProperty("user.name")));
     }
 
     @Ignore

@@ -91,11 +91,12 @@ public final class Main {
 
         /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
         udpServer.submit(
-                new MessageBuilder().setUp(IPMSG_NOOPERATION, "default-user").build(),
+                new MessageBuilder().setUp(config, IPMSG_NOOPERATION, "").build(),
                 new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
         );
         udpServer.submit(
                 new MessageBuilder().setUp(
+                        config,
                         OperationBuilder.ofDefault(IPMSG_BR_ENTRY)
                                         .build(),
                         ""
@@ -107,7 +108,7 @@ public final class Main {
 
     private void shutdown(WindowEvent event) {
         udpServer.submit(
-                new MessageBuilder().setUp(IPMSG_BR_EXIT, "").build(),
+                new MessageBuilder().setUp(config, IPMSG_BR_EXIT, "").build(),
                 new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
         );
         try {
