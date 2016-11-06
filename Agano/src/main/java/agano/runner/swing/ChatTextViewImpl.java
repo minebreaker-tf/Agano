@@ -1,23 +1,31 @@
 package agano.runner.swing;
 
 import agano.config.Config;
+import agano.ipmsg.Message;
 import agano.runner.state.State;
 import agano.runner.state.User;
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import javax.swing.text.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.joining;
-
 public final class ChatTextViewImpl implements ChatTextView {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatTextViewImpl.class);
 
     private final JPanel base;
     private final JTextPane chatText;
+
+    private final AttributeSet timeAttr;
+    private final AttributeSet userAttr;
+    private final AttributeSet defaultAttr;
 
     @Inject
     public ChatTextViewImpl(Config config) {
@@ -32,6 +40,17 @@ public final class ChatTextViewImpl implements ChatTextView {
         LayoutManager layout = new BorderLayout();
         base.setLayout(layout);
         base.add(chatText, BorderLayout.CENTER);
+
+        MutableAttributeSet timeAttr = new SimpleAttributeSet();
+        StyleConstants.ColorConstants.setForeground(timeAttr, fromRGB(106, 135, 89));
+        this.timeAttr = timeAttr;
+
+        MutableAttributeSet userAttr = new SimpleAttributeSet();
+        StyleConstants.ColorConstants.setForeground(userAttr, fromRGB(255, 198, 109));
+        StyleConstants.setItalic(userAttr, true);
+        this.userAttr = userAttr;
+
+        this.defaultAttr = chatText.getCharacterAttributes();
     }
 
     @Override
@@ -44,16 +63,38 @@ public final class ChatTextViewImpl implements ChatTextView {
         Optional<User> selected = state.getSelectedUser();
         if (selected.isPresent()) {
             User user = selected.get();
-            String talks = user.getTalks().stream()
-                               .map(msg -> "[" + now() + " - " + msg.getUser() + " ] " + msg.getLoad())
-                               .collect(joining("\n"));
-            if (!talks.equals(chatText.getText())) {
-                chatText.setText(talks);
+
+            DefaultStyledDocument doc = new DefaultStyledDocument();
+
+            int offset = 0;
+
+            try {
+                for (Message each : user.getTalks()) {
+                    String time = "[" + now() + "] ";
+                    doc.insertString(offset, time, timeAttr);
+                    offset += time.length();
+
+                    String username = each.getUser();
+                    doc.insertString(offset, username, userAttr);
+                    offset += username.length();
+
+                    String msg = " " + each.getLoad() + "\n";
+                    doc.insertString(offset, msg, defaultAttr);
+                    offset += msg.length();
+                }
+            } catch (BadLocationException e) {
+                logger.warn("Failed to draw chat texts.", e);
             }
+            chatText.setStyledDocument(doc);
 
         } else {
             chatText.setText("");
         }
+    }
+
+    private static Color fromRGB(int r, int g, int b) {
+        float[] hsb = Color.RGBtoHSB(r, g, b, null);
+        return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
     }
 
     private static String now() {

@@ -22,7 +22,6 @@ public final class Controller {
 
     @Subscribe
     public void select(SelectionParameter parameter) {
-        logger.debug("Selected: {} - Event: {}", parameter.getSelected(), parameter.getEvent());
         manager.swap(state -> state.selectUser(parameter.getSelected()));
     }
 
