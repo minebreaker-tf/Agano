@@ -16,20 +16,22 @@ public final class State {
 
     private List<User> users;
     private Optional<User> selected;
+    private boolean windowFocused;
 
-    private State(@Nonnull List<User> users, Optional<User> selected) {
+    private State(@Nonnull List<User> users, Optional<User> selected, boolean windowFocused) {
         this.users = ImmutableList.copyOf(checkNotNull(users));
         this.selected = checkNotNull(selected);
+        this.windowFocused = windowFocused;
     }
 
     @Nonnull
     static State initialState() {
-        return new State(Collections.emptyList(), Optional.empty());
+        return new State(Collections.emptyList(), Optional.empty(), false);
     }
 
     @Nonnull
     private State copy() {
-        return new State(users, selected);
+        return new State(users, selected, windowFocused);
     }
 
     /**
@@ -100,6 +102,13 @@ public final class State {
         }
         newState.users = builder.build();
 
+        return newState;
+    }
+
+    @Nonnull
+    public State changeFocus(boolean windowFocused) {
+        State newState = copy();
+        newState.windowFocused = windowFocused;
         return newState;
     }
 

@@ -1,6 +1,7 @@
 package agano.runner.controller;
 
 import agano.runner.parameter.SelectionParameter;
+import agano.runner.parameter.WindowFocusedParameter;
 import agano.runner.state.StateManager;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -23,6 +24,11 @@ public final class Controller {
     public void select(SelectionParameter parameter) {
         logger.debug("Selected: {} - Event: {}", parameter.getSelected(), parameter.getEvent());
         manager.swap(state -> state.selectUser(parameter.getSelected()));
+    }
+
+    @Subscribe
+    public void windowFocused(WindowFocusedParameter parameter) {
+        manager.swap(state -> state.changeFocus(parameter.isWindowFocused()));
     }
 
 }

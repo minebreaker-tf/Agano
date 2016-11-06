@@ -1,7 +1,9 @@
 package agano.runner.swing;
 
+import agano.runner.parameter.WindowFocusedParameter;
 import agano.runner.state.State;
 import agano.util.Constants;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
@@ -9,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -25,7 +28,7 @@ public final class MainForm implements Observer<State> {
     }
 
     @Inject
-    public MainForm(UserList userList, ChatPane chatPane, @Assisted Consumer<WindowEvent> callback) {
+    public MainForm(EventBus eventBus, UserList userList, ChatPane chatPane, @Assisted Consumer<WindowEvent> callback) {
 
         frame = new JFrame();
         frame.setTitle(Constants.title);
@@ -34,6 +37,17 @@ public final class MainForm implements Observer<State> {
             @Override
             public void windowClosed(WindowEvent e) {
                 callback.accept(e);
+            }
+        });
+        frame.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                eventBus.post(new WindowFocusedParameter(e));
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                eventBus.post(new WindowFocusedParameter(e));
             }
         });
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

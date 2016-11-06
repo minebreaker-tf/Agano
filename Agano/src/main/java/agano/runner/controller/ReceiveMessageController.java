@@ -9,6 +9,7 @@ import agano.messaging.ServerManager;
 import agano.runner.parameter.MessageReceivedParameter;
 import agano.runner.state.StateManager;
 import agano.runner.state.User;
+import agano.runner.swing.Notifier;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -30,12 +31,14 @@ public final class ReceiveMessageController {
     private final StateManager stateManager;
     private final ServerManager serverManager;
     private final Config config;
+    private final Notifier notifier;
 
     @Inject
-    public ReceiveMessageController(StateManager stateManager, ServerManager serverManager, Config config) {
+    public ReceiveMessageController(StateManager stateManager, ServerManager serverManager, Config config, Notifier notifier) {
         this.stateManager = stateManager;
         this.serverManager = serverManager;
         this.config = config;
+        this.notifier = notifier;
     }
 
     @Subscribe
@@ -73,6 +76,7 @@ public final class ReceiveMessageController {
 
     private void receivedSendOp(User sender, Message received) {
         logger.info("Message received: {}", received.getLoad());
+        notifier.sendNotification(String.format("From: %s, Message: %s", received.getUser(), received.getLoad()));
         if (received.getOperation().isEnabledOption(Option.IPMSG_SENDCHECKOPT)) {
             serverManager.getUdpServer().submit(
                     new MessageBuilder().setUp(config, IPMSG_RECVMSG, "").build(),
