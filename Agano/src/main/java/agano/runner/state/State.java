@@ -68,6 +68,14 @@ public final class State {
     }
 
     @Nonnull
+    public State clearUser() {
+        State newState = copy();
+        newState.users = Collections.emptyList();
+        newState.selected = Optional.empty();
+        return newState;
+    }
+
+    @Nonnull
     public State selectUser(@Nonnull User user) {
         checkNotNull(user);
 

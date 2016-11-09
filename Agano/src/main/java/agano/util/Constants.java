@@ -17,6 +17,8 @@ public final class Constants {
 //    public static final String defaultFont = "/agano/font/NotoSansCJKjp-Light.otf"; // OpenTypeに対応しているはずなのにうまく読めないorz
     public static final int defaultFontSize = 16;
 
+    public static final String iconFont = "/agano/font/MaterialIcons-Regular.ttf";
+
     public static final String title = "Agano";
 
     public static final int defaultPort = 2425;
