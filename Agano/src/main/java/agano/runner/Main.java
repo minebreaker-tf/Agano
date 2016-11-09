@@ -3,11 +3,11 @@ package agano.runner;
 import agano.config.Config;
 import agano.config.ConfigModule;
 import agano.ipmsg.MessageBuilder;
-import agano.ipmsg.OperationBuilder;
 import agano.libraries.guava.EventBusModule;
 import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
+import agano.runner.action.RefreshAction;
 import agano.runner.controller.Controller;
 import agano.runner.controller.ReceiveMessageController;
 import agano.runner.controller.SendMessageController;
@@ -29,7 +29,7 @@ import java.awt.event.WindowEvent;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 
-import static agano.ipmsg.Command.*;
+import static agano.ipmsg.Command.IPMSG_BR_EXIT;
 
 @Singleton
 public final class Main {
@@ -76,7 +76,8 @@ public final class Main {
             SendMessageController sendMessageController,
             ServerManager serverManager,
             NetHelper netHelper,
-            Config config) {
+            Config config,
+            RefreshAction refresh) {
 
         this.form = formFactory.newInstance(this::shutdown);
         this.udpServer = serverManager.getUdpServer();
@@ -89,20 +90,7 @@ public final class Main {
         eventBus.register(receiveMessageController);
         eventBus.register(sendMessageController);
 
-        /*"default-user\0\0\nUN:default-user\nHN:main\nNN:default-nickname\nGN:"*/
-        udpServer.submit(
-                new MessageBuilder().setUp(config, IPMSG_NOOPERATION, "").build(),
-                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
-        );
-        udpServer.submit(
-                new MessageBuilder().setUp(
-                        config,
-                        OperationBuilder.ofDefault(IPMSG_BR_ENTRY)
-                                        .build(),
-                        ""
-                ).build(),
-                new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
-        );
+        refresh.execute();
 
     }
 

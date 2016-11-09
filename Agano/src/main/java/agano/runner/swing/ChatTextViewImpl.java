@@ -42,11 +42,11 @@ public final class ChatTextViewImpl implements ChatTextView {
         base.add(chatText, BorderLayout.CENTER);
 
         MutableAttributeSet timeAttr = new SimpleAttributeSet();
-        StyleConstants.ColorConstants.setForeground(timeAttr, fromRGB(106, 135, 89));
+        StyleConstants.ColorConstants.setForeground(timeAttr, SwingUtils.fromRGB(106, 135, 89));
         this.timeAttr = timeAttr;
 
         MutableAttributeSet userAttr = new SimpleAttributeSet();
-        StyleConstants.ColorConstants.setForeground(userAttr, fromRGB(255, 198, 109));
+        StyleConstants.ColorConstants.setForeground(userAttr, SwingUtils.fromRGB(255, 198, 109));
         StyleConstants.setItalic(userAttr, true);
         this.userAttr = userAttr;
 
@@ -90,11 +90,6 @@ public final class ChatTextViewImpl implements ChatTextView {
         } else {
             chatText.setText("");
         }
-    }
-
-    private static Color fromRGB(int r, int g, int b) {
-        float[] hsb = Color.RGBtoHSB(r, g, b, null);
-        return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
     }
 
     private static String now() {
