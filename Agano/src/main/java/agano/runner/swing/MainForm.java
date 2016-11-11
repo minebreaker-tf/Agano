@@ -1,6 +1,6 @@
 package agano.runner.swing;
 
-import agano.runner.parameter.WindowFocusedParameter;
+import agano.runner.parameter.Parameters;
 import agano.runner.state.State;
 import agano.util.Constants;
 import com.google.common.eventbus.EventBus;
@@ -42,12 +42,12 @@ public final class MainForm implements Observer<State> {
         frame.addWindowFocusListener(new WindowFocusListener() {
             @Override
             public void windowGainedFocus(WindowEvent e) {
-                eventBus.post(new WindowFocusedParameter(e));
+                eventBus.post(new Parameters.WindowFocusedParameter(e));
             }
 
             @Override
             public void windowLostFocus(WindowEvent e) {
-                eventBus.post(new WindowFocusedParameter(e));
+                eventBus.post(new Parameters.WindowFocusedParameter(e));
             }
         });
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

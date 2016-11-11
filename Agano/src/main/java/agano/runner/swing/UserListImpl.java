@@ -2,8 +2,7 @@ package agano.runner.swing;
 
 import agano.config.Config;
 import agano.libraries.materialicons.IconConstants;
-import agano.runner.action.RefreshAction;
-import agano.runner.parameter.SelectionParameter;
+import agano.runner.parameter.Parameters;
 import agano.runner.state.User;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
@@ -21,7 +20,7 @@ public final class UserListImpl implements UserList {
     private final DefaultListModel<User> model;
 
     @Inject
-    public UserListImpl(EventBus eventBus, Config config, RefreshAction refreshAction) {
+    public UserListImpl(EventBus eventBus, Config config) {
 
         scrollPane = new JScrollPane();
 
@@ -32,7 +31,7 @@ public final class UserListImpl implements UserList {
         list.setBorder(BorderFactory.createEmptyBorder());
         list.addListSelectionListener(e -> {
             User selected = model.get(e.getFirstIndex());
-            eventBus.post(new SelectionParameter(e, selected));
+            eventBus.post(new Parameters.SelectionParameter(e, selected));
         });
         list.setCellRenderer(new UserListCellRenderer());
 
@@ -50,7 +49,7 @@ public final class UserListImpl implements UserList {
         panel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
         IconFontButton refresh = IconFontButton.newInstance(IconConstants.REFRESH);
-        refresh.addActionListener(e -> refreshAction.execute());
+        refresh.addActionListener(e -> eventBus.post(new Parameters.RefreshParameter()));
         panel.add(refresh.component());
         panel.setBorder(BorderFactory.createEmptyBorder());
 

@@ -7,10 +7,10 @@ import agano.libraries.guava.EventBusModule;
 import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
-import agano.runner.action.RefreshAction;
-import agano.runner.controller.Controller;
+import agano.runner.controller.Controllers;
 import agano.runner.controller.ReceiveMessageController;
 import agano.runner.controller.SendMessageController;
+import agano.runner.parameter.Parameters;
 import agano.runner.state.StateManager;
 import agano.runner.swing.MainForm;
 import agano.runner.swing.SwingModule;
@@ -71,13 +71,12 @@ public final class Main {
             MainForm.Factory formFactory,
             EventBus eventBus,
             StateManager stateManager,
-            Controller controller,
+            Controllers controller,
             ReceiveMessageController receiveMessageController,
             SendMessageController sendMessageController,
             ServerManager serverManager,
             NetHelper netHelper,
-            Config config,
-            RefreshAction refresh) {
+            Config config) {
 
         this.form = formFactory.newInstance(this::shutdown);
         this.udpServer = serverManager.getUdpServer();
@@ -90,7 +89,7 @@ public final class Main {
         eventBus.register(receiveMessageController);
         eventBus.register(sendMessageController);
 
-        refresh.execute();
+        eventBus.post(new Parameters.RefreshParameter());
 
     }
 
