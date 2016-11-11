@@ -1,7 +1,6 @@
 package agano.runner.swing;
 
 import agano.config.Config;
-import agano.libraries.materialicons.IconConstants;
 import agano.runner.parameter.Parameters;
 import agano.runner.state.User;
 import com.google.common.eventbus.EventBus;
@@ -10,65 +9,78 @@ import com.google.inject.Inject;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
 
 public final class UserListImpl implements UserList {
 
     private final JPanel base;
     private final JScrollPane scrollPane;
-    private final JList<User> list;
+    private final JList<User> jList;
     private final DefaultListModel<User> model;
 
+    private List<User> users;
+
     @Inject
-    public UserListImpl(EventBus eventBus, Config config) {
+    public UserListImpl(UserListToolbar.Factory toolbarFactory, EventBus eventBus, Config config) {
 
         scrollPane = new JScrollPane();
-
         model = new DefaultListModel<>();
+        base = new JPanel();
+        users = Collections.emptyList();
 
-        list = new JList<>(model);
-        list.setFont(config.getFont());
-        list.setBorder(BorderFactory.createEmptyBorder());
-        list.addListSelectionListener(e -> {
-            User selected = model.get(e.getFirstIndex());
-            eventBus.post(new Parameters.SelectionParameter(e, selected));
+        jList = new JList<>(model);
+        jList.setFont(config.getFont());
+        jList.setBorder(BorderFactory.createEmptyBorder());
+        jList.addListSelectionListener(e -> {
+            synchronized (this) {
+                int i = jList.getSelectedIndex();
+                if (i >= 0) {
+                    eventBus.post(new Parameters.SelectionParameter(e, model.get(i)));
+                }
+            }
         });
-        list.setCellRenderer(new UserListCellRenderer());
+        jList.setCellRenderer(new UserListCellRenderer());
 
-        scrollPane.getViewport().setView(list);
+        scrollPane.getViewport().setView(jList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        base = new JPanel();
+        UserListToolbar toolbar = toolbarFactory.newInstance(condition -> updateWithFilter(users, condition));
 
         LayoutManager layout = new BorderLayout();
         base.setLayout(layout);
 
-        FlowLayout panelLayout = new FlowLayout(FlowLayout.RIGHT, 0, 0);
-        JPanel panel = new JPanel();
-        panel.setLayout(panelLayout);
-        panel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-
-        IconFontButton refresh = IconFontButton.newInstance(IconConstants.REFRESH);
-        refresh.addActionListener(e -> eventBus.post(new Parameters.RefreshParameter()));
-        panel.add(refresh.component());
-        panel.setBorder(BorderFactory.createEmptyBorder());
-
-        base.add(panel, BorderLayout.NORTH);
+        base.add(toolbar.component(), BorderLayout.NORTH);
         base.add(scrollPane, BorderLayout.CENTER);
     }
 
-    @Override
-    public synchronized void update(@Nonnull List<User> state) {
-        if (model.size() == state.size()) {
-            for (int i = 0; i < state.size(); i++) {
-                if (model.get(i) != state.get(i)) {
-                    model.set(i, state.get(i));
+    private synchronized void updateWithFilter(List<User> users, String condition) {
+        // TODO もっといい実装へリファクタ―
+        this.users = users;
+
+        if (model.size() == users.size()) {
+            for (int i = 0; i < users.size(); i++) {
+                if (model.get(i) != users.get(i)) {
+                    model.set(i, users.get(i));
+                }
+            }
+            for (int i = 0; i < model.size(); i++) {
+                if (!model.get(i).getName().contains(condition)) {
+                    model.remove(i);
+                    i = 0;
                 }
             }
         } else {
-            model.removeAllElements();
-            state.forEach(model::addElement);
+            model.clear();
+            users.stream()
+                 .filter(user -> user.getName().contains(condition))
+                 .forEachOrdered(model::addElement);
         }
+    }
+
+    @Override
+    public void update(@Nonnull List<User> users) {
+        updateWithFilter(users, "");
     }
 
     @Override
@@ -86,7 +98,6 @@ public final class UserListImpl implements UserList {
             label.setText(((User) value).getName());
 
             return label;
-
         }
 
     }

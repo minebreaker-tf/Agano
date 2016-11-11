@@ -12,6 +12,9 @@ public class SwingModule extends AbstractModule {
         bind(ChatTextView.class).to(ChatTextViewImpl.class);
 
         install(new FactoryModuleBuilder()
+                        .implement(UserListToolbar.class, UserListToolbarImpl.class)
+                        .build(UserListToolbar.Factory.class));
+        install(new FactoryModuleBuilder()
                         .implement(MainForm.class, MainForm.class)
                         .build(MainForm.Factory.class));
         install(new FactoryModuleBuilder()

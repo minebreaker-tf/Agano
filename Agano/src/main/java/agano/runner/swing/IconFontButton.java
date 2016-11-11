@@ -26,9 +26,12 @@ public final class IconFontButton implements Viewable {
     private static final int iconFontSize = 18;
 
     private final JButton button;
+    private final boolean pushable;
 
-    private IconFontButton(IconConstants icon) {
+    private IconFontButton(IconConstants icon, boolean pushable) {
         button = new JButton(icon.getCodePoint());
+        this.pushable = pushable;
+
         button.setUI(new BasicButtonUI());
         button.setFont(font);
         button.setPreferredSize(new Dimension(24, 24));
@@ -36,28 +39,36 @@ public final class IconFontButton implements Viewable {
         button.setOpaque(true);
         button.setBorder(BorderFactory.createLineBorder(SwingUtils.fromRGB(169, 183, 198), 1));
         button.setBorderPainted(false);
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.setBorderPainted(true);
-                button.setBackground(SwingUtils.fromRGB(85, 85, 85));
-            }
+        if (pushable) {
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    button.setBorderPainted(true);
+                    button.setBackground(SwingUtils.fromRGB(85, 85, 85));
+                }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.setBorderPainted(false);
-                button.setBackground(SwingUtils.fromRGB(60, 63, 65));
-            }
-        });
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    button.setBorderPainted(false);
+                    button.setBackground(SwingUtils.fromRGB(60, 63, 65));
+                }
+            });
+        }
     }
 
     public void addActionListener(@Nullable ActionListener listener) {
+        if (!pushable) throw new UnsupportedOperationException();
         if (listener != null) button.addActionListener(listener);
     }
 
     @Nonnull
     public static IconFontButton newInstance(@Nonnull IconConstants icon) {
-        return new IconFontButton(checkNotNull(icon));
+        return new IconFontButton(checkNotNull(icon), true);
+    }
+
+    @Nonnull
+    public static IconFontButton newInstance(@Nonnull IconConstants icon, boolean pushable) {
+        return new IconFontButton(checkNotNull(icon), pushable);
     }
 
     private static Font createFont() {
