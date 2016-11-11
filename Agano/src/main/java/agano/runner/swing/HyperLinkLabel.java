@@ -1,9 +1,6 @@
 package agano.runner.swing;
 
-import agano.config.Config;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,16 +21,11 @@ public final class HyperLinkLabel implements Viewable {
 
     private final JLabel label;
 
-    public interface Factory {
-        public HyperLinkLabel newInstance(@Nonnull String text, @Nonnull URI linkTo);
-    }
-
-    @Inject
-    public HyperLinkLabel(Config config, @Assisted String text, @Assisted URI linkTo) {
+    public HyperLinkLabel(@Nonnull String text, @Nonnull URI linkTo, @Nonnull Font original) {
         label = new JLabel(checkNotNull(text));
         checkNotNull(linkTo);
 
-        label.setFont(linkFont(config));
+        label.setFont(linkFont(original));
         label.setForeground(SwingUtils.fromRGB(40, 123, 222));
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         label.addMouseListener(new MouseAdapter() {
@@ -49,9 +41,8 @@ public final class HyperLinkLabel implements Viewable {
         });
     }
 
-    private Font linkFont(Config config) {
-        return config.getFont()
-                     .deriveFont(ImmutableMap.of(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON));
+    private Font linkFont(Font font) {
+        return font.deriveFont(ImmutableMap.of(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON));
     }
 
     @Override

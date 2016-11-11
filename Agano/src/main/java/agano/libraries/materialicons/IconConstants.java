@@ -3,6 +3,7 @@ package agano.libraries.materialicons;
 public enum IconConstants {
 
     SEND("\ue163"),
+    HELP("\ue8fd"),
     SEARCH("\ue8b6"),
     REFRESH("\ue5d5"),
     FILE("\ue24d"),

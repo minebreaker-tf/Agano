@@ -17,9 +17,6 @@ public class SwingModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                         .implement(ChatToolbar.class, ChatToolbarImpl.class)
                         .build(ChatToolbar.Factory.class));
-        install(new FactoryModuleBuilder()
-                        .implement(HyperLinkLabel.class, HyperLinkLabel.class)
-                        .build(HyperLinkLabel.Factory.class));
     }
 
 }

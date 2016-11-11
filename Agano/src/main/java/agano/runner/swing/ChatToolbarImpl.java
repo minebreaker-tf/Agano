@@ -14,7 +14,7 @@ public final class ChatToolbarImpl implements ChatToolbar {
     private final JPanel base;
 
     @Inject
-    public ChatToolbarImpl(@Assisted Consumer<ActionEvent> callback) {
+    public ChatToolbarImpl(HelpDialog dialog, @Assisted Consumer<ActionEvent> sendHandler) {
 
         base = new JPanel();
         base.setBorder(BorderFactory.createEmptyBorder());
@@ -24,8 +24,12 @@ public final class ChatToolbarImpl implements ChatToolbar {
         base.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
         IconFontButton refresh = IconFontButton.newInstance(IconConstants.SEND);
-        refresh.addActionListener(callback::accept);
+        refresh.addActionListener(sendHandler::accept);
         base.add(refresh.component());
+
+        IconFontButton help = IconFontButton.newInstance(IconConstants.HELP);
+        help.addActionListener(e -> dialog.showDialog());
+        base.add(help.component());
 
     }
 
