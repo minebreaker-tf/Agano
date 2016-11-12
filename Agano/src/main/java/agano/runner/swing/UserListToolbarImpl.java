@@ -9,7 +9,11 @@ import com.google.inject.assistedinject.Assisted;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.TextAction;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 
 public class UserListToolbarImpl implements UserListToolbar {
@@ -41,6 +45,20 @@ public class UserListToolbarImpl implements UserListToolbar {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 onChange();
+            }
+        });
+
+        // Suppress beep
+        field.getActionMap().put(DefaultEditorKit.deletePrevCharAction, new TextAction(DefaultEditorKit.deletePrevCharAction) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (field.getCaretPosition() > 0) {
+                    try {
+                        field.getDocument().remove(field.getCaretPosition() - 1, 1);
+                    } catch (BadLocationException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
         });
 

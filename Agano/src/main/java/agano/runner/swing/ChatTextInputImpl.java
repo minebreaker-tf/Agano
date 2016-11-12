@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.TextAction;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -54,6 +57,21 @@ public final class ChatTextInputImpl implements ChatTextInput {
             }
         });
         textArea.setTransferHandler(new DropHandler());
+
+        // Suppress beep
+        textArea.getActionMap().put(DefaultEditorKit.deletePrevCharAction, new TextAction(DefaultEditorKit.deletePrevCharAction) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (textArea.getCaretPosition() > 0) {
+                    try {
+                        textArea.getDocument().remove(textArea.getCaretPosition() - 1, 1);
+                    } catch (BadLocationException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+
 
         ChatToolbar toolbar = chatToolbar.newInstance(e -> submit());
 
