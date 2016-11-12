@@ -1,7 +1,9 @@
 package agano.runner.swing;
 
+import agano.config.Config;
 import agano.libraries.materialicons.IconConstants;
 import agano.runner.parameter.Parameters;
+import agano.util.Constants;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -9,80 +11,51 @@ import com.google.inject.assistedinject.Assisted;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.TextAction;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 
 public class UserListToolbarImpl implements UserListToolbar {
 
     private final JPanel base;
     private final JTextField field;
+    private final Consumer<String> onTextChange;
 
     @Inject
-    public UserListToolbarImpl(EventBus eventBus, @Assisted Consumer<String> onTextChange) {
+    public UserListToolbarImpl(EventBus eventBus, Config config, @Assisted Consumer<String> onTextChange) {
         base = new JPanel();
         base.setBorder(BorderFactory.createEmptyBorder());
 
+        this.onTextChange = onTextChange;
+
         field = new JTextField();
-        field.getDocument().addDocumentListener(new DocumentListener() {
-            private void onChange() {
-                onTextChange.accept(field.getText());
-            }
+        field.getDocument().addDocumentListener(new DocumentListenerAdaptor());
+        field.getActionMap().put(DefaultEditorKit.deletePrevCharAction, SwingUtils.beeplessDeletePrevCharAction(field));
+        field.setFont(config.getFont().deriveFont((float) Constants.defaultSearchFontSize));
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                onChange();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                onChange();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                onChange();
-            }
-        });
-
-        // Suppress beep
-        field.getActionMap().put(DefaultEditorKit.deletePrevCharAction, new TextAction(DefaultEditorKit.deletePrevCharAction) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (field.getCaretPosition() > 0) {
-                    try {
-                        field.getDocument().remove(field.getCaretPosition() - 1, 1);
-                    } catch (BadLocationException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        BorderLayout layout = new BorderLayout();
-        base.setLayout(layout);
+        base.setLayout(new BorderLayout());
 
         base.add(searcher(), BorderLayout.CENTER);
-
-        IconFontButton refresh = IconFontButton.newInstance(IconConstants.REFRESH);
-        refresh.addActionListener(e -> eventBus.post(new Parameters.RefreshParameter()));
-        base.add(refresh.component(), BorderLayout.EAST);
+        base.add(
+                IconFontButton.newInstance(
+                        IconConstants.REFRESH,
+                        e -> eventBus.post(new Parameters.RefreshParameter())
+                ).component(),
+                BorderLayout.EAST
+        );
     }
 
     private JComponent searcher() {
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createLineBorder(SwingUtils.fromRGB(62, 78, 93), 3));
+        panel.setBorder(BorderFactory.createLineBorder(SwingUtils.textFieldBorder(), 3));
         panel.setLayout(new BorderLayout());
 
         field.setBorder(BorderFactory.createEmptyBorder());
-        field.setBackground(SwingUtils.fromRGB(60, 63, 65));
+        field.setBackground(SwingUtils.appBackgorund());
         field.setMargin(new Insets(0, 0, 0, 0));
         panel.add(field, BorderLayout.CENTER);
 
-        IconFontButton searchIcon = IconFontButton.newInstance(IconConstants.SEARCH, false);
+        IconFontButton searchIcon = IconFontButton.newInstance(IconConstants.SEARCH);
         panel.add(searchIcon.component(), BorderLayout.WEST);
 
         return panel;
@@ -91,6 +64,28 @@ public class UserListToolbarImpl implements UserListToolbar {
     @Override
     public JComponent component() {
         return base;
+    }
+
+    private class DocumentListenerAdaptor implements DocumentListener {
+
+        private void onChange() {
+            onTextChange.accept(field.getText());
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            onChange();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            onChange();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            onChange();
+        }
     }
 
 }

@@ -42,11 +42,11 @@ public final class ChatTextViewImpl implements ChatTextView {
         base.add(chatText, BorderLayout.CENTER);
 
         MutableAttributeSet timeAttr = new SimpleAttributeSet();
-        StyleConstants.ColorConstants.setForeground(timeAttr, SwingUtils.fromRGB(106, 135, 89));
+        StyleConstants.ColorConstants.setForeground(timeAttr, SwingUtils.timestamp());
         this.timeAttr = timeAttr;
 
         MutableAttributeSet userAttr = new SimpleAttributeSet();
-        StyleConstants.ColorConstants.setForeground(userAttr, SwingUtils.fromRGB(255, 198, 109));
+        StyleConstants.ColorConstants.setForeground(userAttr, SwingUtils.username());
         StyleConstants.setItalic(userAttr, true);
         this.userAttr = userAttr;
 

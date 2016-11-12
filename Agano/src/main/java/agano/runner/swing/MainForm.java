@@ -22,6 +22,7 @@ public final class MainForm implements Observer<State> {
     private final JSplitPane splitPane;
     private final UserList userList;
     private final ChatPane chatPane;
+    private final EventBus eventBus;
 
     public interface Factory {
         public MainForm newInstance(Consumer<WindowEvent> callback);
@@ -29,6 +30,8 @@ public final class MainForm implements Observer<State> {
 
     @Inject
     public MainForm(EventBus eventBus, UserList userList, ChatPane chatPane, @Assisted Consumer<WindowEvent> callback) {
+
+        this.eventBus = eventBus;
 
         frame = new JFrame();
         frame.setTitle(Constants.title);
@@ -39,17 +42,7 @@ public final class MainForm implements Observer<State> {
                 callback.accept(e);
             }
         });
-        frame.addWindowFocusListener(new WindowFocusListener() {
-            @Override
-            public void windowGainedFocus(WindowEvent e) {
-                eventBus.post(new Parameters.WindowFocusedParameter(e));
-            }
-
-            @Override
-            public void windowLostFocus(WindowEvent e) {
-                eventBus.post(new Parameters.WindowFocusedParameter(e));
-            }
-        });
+        frame.addWindowFocusListener(new WindowFocusListenerAdaptor());
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
@@ -75,6 +68,24 @@ public final class MainForm implements Observer<State> {
 
         userList.update(state.getUsers());
         chatPane.update(state);
+    }
+
+    private class WindowFocusListenerAdaptor implements WindowFocusListener {
+
+        private void post(WindowEvent e) {
+            eventBus.post(new Parameters.WindowFocusedParameter(e));
+        }
+
+        @Override
+        public void windowGainedFocus(WindowEvent e) {
+            post(e);
+        }
+
+        @Override
+        public void windowLostFocus(WindowEvent e) {
+            post(e);
+        }
+
     }
 
 }

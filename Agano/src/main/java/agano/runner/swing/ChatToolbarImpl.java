@@ -23,13 +23,8 @@ public final class ChatToolbarImpl implements ChatToolbar {
         base.setLayout(layout);
         base.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
-        IconFontButton refresh = IconFontButton.newInstance(IconConstants.SEND);
-        refresh.addActionListener(sendHandler::accept);
-        base.add(refresh.component());
-
-        IconFontButton help = IconFontButton.newInstance(IconConstants.HELP);
-        help.addActionListener(e -> dialog.showDialog());
-        base.add(help.component());
+        base.add(IconFontButton.newInstance(IconConstants.SEND, sendHandler::accept).component());
+        base.add(IconFontButton.newInstance(IconConstants.HELP, e -> dialog.showDialog()).component());
 
     }
 
