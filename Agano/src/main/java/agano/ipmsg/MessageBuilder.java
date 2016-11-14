@@ -5,6 +5,8 @@ import agano.util.Constants;
 import agano.util.NetHelper;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -18,10 +20,11 @@ public final class MessageBuilder {
     private Operation operation;
     private String load;
     private int port;
+    private List<Attachment> attachments;
 
     @Nonnull
     public Message build() {
-        return new Message(version, packetNumber, user, host, operation.getCode(), load, port);
+        return new Message(version, packetNumber, user, host, operation.getCode(), load, port, attachments);
     }
 
     private static AtomicLong last = new AtomicLong();
@@ -44,6 +47,7 @@ public final class MessageBuilder {
         this.operation = checkNotNull(operation);
         this.load = checkNotNull(load);
         this.port = config.getPort();
+        this.attachments = Collections.emptyList();
 
         return this;
     }
@@ -106,6 +110,12 @@ public final class MessageBuilder {
     @Nonnull
     public MessageBuilder port(int port) {
         this.port = port;
+        return this;
+    }
+
+    @Nonnull
+    public MessageBuilder attachments(List<Attachment> attachments) {
+        this.attachments = attachments;
         return this;
     }
 

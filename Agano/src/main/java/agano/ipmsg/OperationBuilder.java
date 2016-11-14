@@ -7,7 +7,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class OperationBuilder {
 
-    private static final EnumSet<Option> defaultOperations = EnumSet.of(Option.IPMSG_CAPUTF8OPT);
+    private static final EnumSet<Option> defaultOperations = EnumSet.of(
+            Option.IPMSG_CAPUTF8OPT,
+            Option.IPMSG_FILEATTACHOPT
+    );
 
     private Command command;
     private EnumSet<Option> operations;

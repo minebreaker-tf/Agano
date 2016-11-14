@@ -26,7 +26,7 @@ public final class Operation {
         this.options = Option.find(code);
     }
 
-    Operation(@Nonnull Command command, @Nonnull EnumSet<Option> options) {
+    public Operation(@Nonnull Command command, @Nonnull EnumSet<Option> options) {
 
         this.command = checkNotNull(command);
         this.options = checkNotNull(options).clone();

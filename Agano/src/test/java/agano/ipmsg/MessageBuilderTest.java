@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -19,7 +20,7 @@ public class MessageBuilderTest {
 
     @Before
     public void setUp() {
-        message = new Message("1", 123, "user", "host", 1L, "load", 2425);
+        message = new Message("1", 123, "user", "host", 1L, "load", 2425, Collections.emptyList());
     }
 
     @Test

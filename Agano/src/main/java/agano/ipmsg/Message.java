@@ -1,11 +1,13 @@
 package agano.ipmsg;
 
 import agano.util.Constants;
+import agano.util.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
-
+import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -22,6 +24,7 @@ public final class Message {
     private final Operation operation;
     private final String load;
     private final int port;
+    private final List<Attachment> attachments;
 
     /**
      * @param version      フォーマットバージョン
@@ -39,8 +42,9 @@ public final class Message {
             @Nonnull String host,
             long command,
             @Nonnull String load,
-            int port) {
-        this(version, packetNumber, user, host, new Operation(command), load, port);
+            int port,
+            List<Attachment> attachments) {
+        this(version, packetNumber, user, host, new Operation(command), load, port, attachments);
     }
 
     public Message(
@@ -50,7 +54,8 @@ public final class Message {
             @Nonnull String host,
             @Nonnull Operation command,
             @Nonnull String load,
-            int port) {
+            int port,
+            @Nonnull List<Attachment> attachments) {
         this.version = checkNotNull(version);
         this.packetNumber = packetNumber;
         this.user = checkNotNull(user);
@@ -58,6 +63,7 @@ public final class Message {
         this.operation = checkNotNull(command);
         this.load = checkNotNull(load);
         this.port = port;
+        this.attachments = ImmutableList.copyOf(attachments);
     }
 
     /**
@@ -93,8 +99,15 @@ public final class Message {
      */
     @Override
     public String toString() {
-        return Joiner.on(":")
-                     .join(Constants.protocolVersion, packetNumber, user, host, operation, load);
+        StringBuilder exp = new StringBuilder();
+        exp.append(
+                Joiner.on(":").join(Constants.protocolVersion, packetNumber, user, host, operation, load));
+        if (!attachments.isEmpty()) {
+            exp.append(StringUtils.nullPointer)
+               .append(Attachment.encodeAttachments(attachments));
+        }
+
+        return exp.toString();
     }
 
     public String explain() {
@@ -106,6 +119,7 @@ public final class Message {
                           .add("Operation", operation.explain())
                           .add("Load", load)
                           .add("Port", port)
+                          .add("Attachments", attachments)
                           .toString();
     }
 
@@ -140,6 +154,11 @@ public final class Message {
 
     public int getPort() {
         return port;
+    }
+
+    @Nonnull
+    public List<Attachment> getAttachments() {
+        return attachments;
     }
 
 }

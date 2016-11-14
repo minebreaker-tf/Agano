@@ -5,6 +5,7 @@ import com.google.common.base.Splitter;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import static agano.util.StringUtils.byteToString;
@@ -42,7 +43,8 @@ public final class MessageFactory {
                     packet.get(3),
                     Long.valueOf(packet.get(4)),
                     packet.get(5),
-                    port
+                    port,
+                    Collections.emptyList() // TODO
             );
 
         } catch (IndexOutOfBoundsException e) {

@@ -5,6 +5,10 @@ import java.nio.charset.Charset;
 
 public final class StringUtils {
 
+    public static final String nullPointer = "\0"; // null pointer (\0)
+    public static final String fileDelimiter = "\07"; // ベル文字 (\a)
+    public static final String dummyHost = "\b";
+
     private StringUtils() {}
 
     public static String byteToString(byte[] bytes, Charset charset) {
