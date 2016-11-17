@@ -5,7 +5,6 @@ import com.google.common.base.Splitter;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 import static agano.util.StringUtils.byteToString;
@@ -38,19 +37,66 @@ public final class MessageFactory {
 
             return new Message(
                     packet.get(0),
-                    Long.valueOf(packet.get(1)),
+                    Long.parseLong(packet.get(1)),
                     packet.get(2),
                     packet.get(3),
-                    Long.valueOf(packet.get(4)),
+                    Long.parseLong(packet.get(4)),
                     packet.get(5),
-                    port,
-                    Collections.emptyList() // TODO
+                    port
             );
 
-        } catch (IndexOutOfBoundsException e) {
-            throw new MalformedMessageException(message);
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            throw new MalformedMessageException(message, e);
         }
 
+    }
+
+    @Nonnull
+    public static FileAttachedMessage fileAttachedMessageFromString(@Nonnull String original, int port) {
+        try {
+            List<String> packet = split(original);
+            String load = packet.get(5);
+            String[] sep = load.split("\\u0000");
+            String message = sep[0];
+            List<Attachment> attachments = Attachment.decodeAttachments(sep[1]);
+            Operation op = new Operation(Long.parseLong(packet.get(4)));
+
+            return new FileAttachedMessage(
+                    packet.get(0),
+                    Long.parseLong(packet.get(1)),
+                    packet.get(2),
+                    packet.get(3),
+                    op,
+                    message,
+                    port,
+                    attachments
+            );
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            throw new MalformedMessageException(original, e);
+        }
+    }
+
+    @Nonnull
+    public static FileSendRequestMessage fileSendRequestMessageFromString(@Nonnull String original, int port) {
+        try {
+            String[] packet = original.split(":");
+
+            Operation op = new Operation(Long.parseLong(packet[4]));
+
+            return new FileSendRequestMessage(
+                    packet[0],
+                    Long.parseLong(packet[1]),
+                    packet[2],
+                    packet[3],
+                    op,
+                    port,
+                    Long.parseLong(packet[5], 16),
+                    Long.parseLong(packet[6], 16),
+                    Long.parseLong(packet[7], 16)
+            );
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            throw new MalformedMessageException(original, e);
+        }
     }
 
     /**

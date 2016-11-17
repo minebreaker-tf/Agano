@@ -10,6 +10,12 @@ public final class FileInfo {
     private final FileType fileType;
     private final EnumSet<Attribute> attributes;
 
+    public FileInfo(FileType fileType) {
+        this.fileType = fileType;
+        this.attributes = EnumSet.noneOf(Attribute.class);
+        this.code = fileType.getCode();
+    }
+
     public FileInfo(FileType fileType, EnumSet<Attribute> attribute) {
         this.fileType = fileType;
         this.attributes = attribute;

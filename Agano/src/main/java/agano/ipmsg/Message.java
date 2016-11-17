@@ -1,13 +1,10 @@
 package agano.ipmsg;
 
 import agano.util.Constants;
-import agano.util.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -15,7 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * 送受信に使われるメッセージを表すクラスです.
  */
-public final class Message {
+public class Message {
 
     private final String version;
     private final long packetNumber;
@@ -24,14 +21,13 @@ public final class Message {
     private final Operation operation;
     private final String load;
     private final int port;
-    private final List<Attachment> attachments;
 
     /**
      * @param version      フォーマットバージョン
      * @param packetNumber パケット番号(一意性の判断に使われる)
      * @param user         自ユーザー名
      * @param host         自ホスト名/IPアドレス
-     * @param command      命令を表す番号
+     * @param operation      命令を表す番号
      * @param load         拡張部
      * @param port         メッセージの送信元ポート
      */
@@ -40,11 +36,16 @@ public final class Message {
             long packetNumber,
             @Nonnull String user,
             @Nonnull String host,
-            long command,
+            long operation,
             @Nonnull String load,
-            int port,
-            List<Attachment> attachments) {
-        this(version, packetNumber, user, host, new Operation(command), load, port, attachments);
+            int port) {
+        this.version = checkNotNull(version);
+        this.packetNumber = packetNumber;
+        this.user = checkNotNull(user);
+        this.host = checkNotNull(host);
+        this.operation = new Operation(operation);
+        this.load = checkNotNull(load);
+        this.port = port;
     }
 
     public Message(
@@ -52,18 +53,10 @@ public final class Message {
             long packetNumber,
             @Nonnull String user,
             @Nonnull String host,
-            @Nonnull Operation command,
+            @Nonnull Operation operation,
             @Nonnull String load,
-            int port,
-            @Nonnull List<Attachment> attachments) {
-        this.version = checkNotNull(version);
-        this.packetNumber = packetNumber;
-        this.user = checkNotNull(user);
-        this.host = checkNotNull(host);
-        this.operation = checkNotNull(command);
-        this.load = checkNotNull(load);
-        this.port = port;
-        this.attachments = ImmutableList.copyOf(attachments);
+            int port) {
+        this(version, packetNumber, user, host, operation.getCode(), load, port);
     }
 
     /**
@@ -99,17 +92,10 @@ public final class Message {
      */
     @Override
     public String toString() {
-        StringBuilder exp = new StringBuilder();
-        exp.append(
-                Joiner.on(":").join(Constants.protocolVersion, packetNumber, user, host, operation, load));
-        if (!attachments.isEmpty()) {
-            exp.append(StringUtils.nullPointer)
-               .append(Attachment.encodeAttachments(attachments));
-        }
-
-        return exp.toString();
+        return Joiner.on(":").join(Constants.protocolVersion, packetNumber, user, host, operation, load);
     }
 
+    @Nonnull
     public String explain() {
         return MoreObjects.toStringHelper(this)
                           .add("Version", version)
@@ -119,7 +105,6 @@ public final class Message {
                           .add("Operation", operation.explain())
                           .add("Load", load)
                           .add("Port", port)
-                          .add("Attachments", attachments)
                           .toString();
     }
 
@@ -154,11 +139,6 @@ public final class Message {
 
     public int getPort() {
         return port;
-    }
-
-    @Nonnull
-    public List<Attachment> getAttachments() {
-        return attachments;
     }
 
 }

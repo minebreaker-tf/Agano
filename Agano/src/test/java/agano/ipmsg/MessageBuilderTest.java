@@ -20,7 +20,7 @@ public class MessageBuilderTest {
 
     @Before
     public void setUp() {
-        message = new Message("1", 123, "user", "host", 1L, "load", 2425, Collections.emptyList());
+        message = new Message("1", 123, "user", "host", 1L, "load", 2425);
     }
 
     @Test
@@ -41,7 +41,6 @@ public class MessageBuilderTest {
         assertThat(built.getOperation(), is(message.getOperation()));
         assertThat(built.getLoad(), is(message.getLoad()));
         assertThat(built.getPort(), is(message.getPort()));
-
     }
 
 
@@ -57,6 +56,48 @@ public class MessageBuilderTest {
         assertThat(built.getOperation(), is(message.getOperation()));
         assertThat(built.getLoad(), is(message.getLoad()));
         assertThat(built.getPort(), is(Constants.defaultPort));
-
     }
+
+    @Test
+    public void testFileAttachedMessage() {
+        FileAttachedMessage built = new MessageBuilder()
+                .version("1")
+                .packetNumber(123)
+                .user("user")
+                .host("host")
+                .operation(new Operation(2097184))
+                .load("load")
+                .port(2425)
+                .attachments(Collections.singletonList(
+                        new Attachment(123, "text.txt", 10, 11, new FileInfo(FileType.IPMSG_FILE_REGULAR))
+                ))
+                .buildFileAttachedMessage();
+
+        assertThat(built.getAttachments().size(), is(1));
+        assertThat(built.getAttachments().get(0).getFileID(), is(123L));
+        assertThat(built.getAttachments().get(0).getFilename(), is("text.txt"));
+        assertThat(built.getAttachments().get(0).getFilesize(), is(10L));
+        assertThat(built.getAttachments().get(0).getMtime(), is(11L));
+        assertThat(built.getAttachments().get(0).getFileInfo().getFileType(), is(FileType.IPMSG_FILE_REGULAR));
+    }
+
+    @Test
+    public void testFileSendRequest() {
+        FileSendRequestMessage built = new MessageBuilder()
+                .version("1")
+                .packetNumber(123)
+                .user("user")
+                .host("host")
+                .operation(new Operation(96))
+                .load("load")
+                .port(2425)
+                .fileSendRequest(10, 11, 12)
+                .buildFileSendRequest();
+
+        assertThat(built.getLoad(), is("a:b:c"));
+        assertThat(built.getRequestPacketNumber(), is(10L));
+        assertThat(built.getRequestFileID(), is(11L));
+        assertThat(built.getOffset(), is(12L));
+    }
+
 }

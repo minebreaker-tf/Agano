@@ -4,9 +4,9 @@ import agano.config.Config;
 import agano.config.ConfigModule;
 import agano.ipmsg.MessageBuilder;
 import agano.libraries.guava.EventBusModule;
-import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
+import agano.messaging.UdpServer;
 import agano.runner.controller.Controllers;
 import agano.runner.controller.ReceiveMessageController;
 import agano.runner.controller.SendMessageController;
@@ -37,7 +37,7 @@ public final class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private final MainForm form;
-    private final NettyUdpServer udpServer;
+    private final UdpServer udpServer;
     private final NetHelper netHelper;
     private final Config config;
 

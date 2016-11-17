@@ -8,4 +8,8 @@ public class MalformedMessageException extends AganoException {
         super("Invalid message format: " + raw);
     }
 
+    public MalformedMessageException(String raw, Exception cause) {
+        super("Invalid message format: " + raw, cause);
+    }
+
 }

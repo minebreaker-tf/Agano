@@ -7,7 +7,7 @@ public final class SendableAttachment extends Attachment {
     private final Path sendingFile;
 
     public SendableAttachment(
-            String fileID,
+            long fileID,
             String filename,
             long fileSize,
             long mtime,

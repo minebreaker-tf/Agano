@@ -1,6 +1,7 @@
 package agano.ipmsg;
 
 import agano.util.StringUtils;
+import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -11,14 +12,14 @@ import java.util.StringJoiner;
  */
 public class Attachment {
 
-    private final String fileID;
+    private final long fileID;
     private final String filename;
     private final long filesize;
     private final long mtime; // 最終変更時刻
     private final FileInfo fileInfo;
 
     public Attachment(
-            String fileID,
+            long fileID,
             String filename,
             long fileSize,
             long mtime,
@@ -30,7 +31,7 @@ public class Attachment {
         this.fileInfo = fileInfo;
     }
 
-    public String getFileID() {
+    public long getFileID() {
         return fileID;
     }
 
@@ -52,7 +53,7 @@ public class Attachment {
 
     @Override
     public String toString() {
-        return new StringJoiner(":").add(fileID)
+        return new StringJoiner(":").add(Long.toString(fileID))
                                     .add(filename)
                                     .add(Long.toHexString(filesize))
                                     .add(Long.toHexString(mtime))
@@ -60,12 +61,31 @@ public class Attachment {
                                     .toString();
     }
 
+    @Nonnull
     public static String encodeAttachments(@Nonnull List<Attachment> attachments) {
         StringBuilder builder = new StringBuilder();
         for (Attachment each : attachments) {
             builder.append(each).append(StringUtils.fileDelimiter);
         }
         return builder.toString();
+    }
+
+    @Nonnull
+    public static List<Attachment> decodeAttachments(@Nonnull String exp) {
+        String[] attachments = exp.split(StringUtils.fileDelimiter);
+        ImmutableList.Builder<Attachment> builder = ImmutableList.builder();
+        for (String attachment : attachments) {
+            String[] sep = attachment.split(":");
+            builder.add(new Attachment(
+                    Long.parseLong(sep[0]),
+                    sep[1],
+                    Long.parseLong(sep[2], 16),
+                    Long.parseLong(sep[3], 16),
+                    new FileInfo(Long.parseLong(sep[4]))
+            ));
+        }
+
+        return builder.build();
     }
 
 }

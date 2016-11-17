@@ -5,7 +5,6 @@ import agano.util.Constants;
 import agano.util.NetHelper;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -20,11 +19,27 @@ public final class MessageBuilder {
     private Operation operation;
     private String load;
     private int port;
+
     private List<Attachment> attachments;
+
+    private long requestPacketNumber;
+    private long requestFileID;
+    private long requestOffset;
 
     @Nonnull
     public Message build() {
-        return new Message(version, packetNumber, user, host, operation.getCode(), load, port, attachments);
+        return new Message(version, packetNumber, user, host, operation.getCode(), load, port);
+    }
+
+    @Nonnull
+    public FileAttachedMessage buildFileAttachedMessage() {
+        checkNotNull(attachments);
+        return new FileAttachedMessage(version, packetNumber, user, host, operation, load, port, attachments);
+    }
+
+    @Nonnull
+    public FileSendRequestMessage buildFileSendRequest() {
+        return new FileSendRequestMessage(version, packetNumber, user, host, operation, port, requestPacketNumber, requestFileID, requestOffset);
     }
 
     private static AtomicLong last = new AtomicLong();
@@ -47,7 +62,6 @@ public final class MessageBuilder {
         this.operation = checkNotNull(operation);
         this.load = checkNotNull(load);
         this.port = config.getPort();
-        this.attachments = Collections.emptyList();
 
         return this;
     }
@@ -116,6 +130,14 @@ public final class MessageBuilder {
     @Nonnull
     public MessageBuilder attachments(List<Attachment> attachments) {
         this.attachments = attachments;
+        return this;
+    }
+
+    @Nonnull
+    public MessageBuilder fileSendRequest(long requestPacketNumber, long requestFileID, long requestOffset) {
+        this.requestPacketNumber = requestPacketNumber;
+        this.requestFileID = requestFileID;
+        this.requestOffset = requestOffset;
         return this;
     }
 

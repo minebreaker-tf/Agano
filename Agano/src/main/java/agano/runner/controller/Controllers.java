@@ -3,8 +3,8 @@ package agano.runner.controller;
 import agano.config.Config;
 import agano.ipmsg.MessageBuilder;
 import agano.ipmsg.OperationBuilder;
-import agano.messaging.NettyUdpServer;
 import agano.messaging.ServerManager;
+import agano.messaging.UdpServer;
 import agano.runner.parameter.Parameters;
 import agano.runner.state.State;
 import agano.runner.state.StateManager;
@@ -22,7 +22,7 @@ import static agano.ipmsg.Command.IPMSG_NOOPERATION;
 public final class Controllers {
 
     private final StateManager manager;
-    private final NettyUdpServer udpServer;
+    private final UdpServer udpServer;
     private final Config config;
     private final NetHelper netHelper;
 

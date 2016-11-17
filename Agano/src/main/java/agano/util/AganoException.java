@@ -13,4 +13,9 @@ public class AganoException extends RuntimeException {
         super(e);
     }
 
+    public AganoException(String description, Exception cause) {
+        super(description, cause);
+    }
+
+
 }
