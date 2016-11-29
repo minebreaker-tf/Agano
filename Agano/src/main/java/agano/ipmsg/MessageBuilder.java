@@ -20,7 +20,7 @@ public final class MessageBuilder {
     private String load;
     private int port;
 
-    private List<Attachment> attachments;
+    private List<? extends Attachment> attachments;
 
     private long requestPacketNumber;
     private long requestFileID;
@@ -44,10 +44,9 @@ public final class MessageBuilder {
 
     private static AtomicLong last = new AtomicLong();
 
-    private long generatePacketNumber() {
+    public static long generatePacketNumber() {
         long val = System.currentTimeMillis() / 1000;  // IPmsgに桁数をあわせる
         return last.updateAndGet(n -> n != val ? val : n + 1); // TODO 値がアプリ全体を通して重複しないようにする。そのうちもっといい実装に変更。
-        // 実際には同期のパフォーマンスのせいで勝手にずれてくれるorz
         // 番号は時間である必要がないから、単純なインクリメントにするのがベストかも
     }
 
@@ -128,7 +127,7 @@ public final class MessageBuilder {
     }
 
     @Nonnull
-    public MessageBuilder attachments(List<Attachment> attachments) {
+    public MessageBuilder attachments(List<? extends Attachment> attachments) {
         this.attachments = attachments;
         return this;
     }

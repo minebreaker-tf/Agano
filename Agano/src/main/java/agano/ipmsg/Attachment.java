@@ -1,6 +1,7 @@
 package agano.ipmsg;
 
 import agano.util.StringUtils;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
@@ -56,13 +57,23 @@ public class Attachment {
         return new StringJoiner(":").add(Long.toString(fileID))
                                     .add(filename)
                                     .add(Long.toHexString(filesize))
-                                    .add(Long.toHexString(mtime))
+                                    .add(Long.toHexString(mtime / 1000))
                                     .add(fileInfo.toString())
                                     .toString();
     }
 
+    public String explain() {
+        return MoreObjects.toStringHelper(this)
+                          .add("FileID", getFileID())
+                          .add("Filename", getFilename())
+                          .add("Filesize", getFilesize())
+                          .add("Mtime", getMtime())
+                          .add("FileInfo", getFileInfo())
+                          .toString();
+    }
+
     @Nonnull
-    public static String encodeAttachments(@Nonnull List<Attachment> attachments) {
+    public static String encodeAttachments(@Nonnull List<? extends Attachment> attachments) {
         StringBuilder builder = new StringBuilder();
         for (Attachment each : attachments) {
             builder.append(each).append(StringUtils.fileDelimiter);

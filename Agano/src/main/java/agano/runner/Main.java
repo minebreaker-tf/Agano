@@ -3,13 +3,12 @@ package agano.runner;
 import agano.config.Config;
 import agano.config.ConfigModule;
 import agano.ipmsg.MessageBuilder;
+import agano.libraries.guava.EventBusBinder;
 import agano.libraries.guava.EventBusModule;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
+import agano.messaging.TcpServer;
 import agano.messaging.UdpServer;
-import agano.runner.controller.Controllers;
-import agano.runner.controller.ReceiveMessageController;
-import agano.runner.controller.SendMessageController;
 import agano.runner.parameter.Parameters;
 import agano.runner.state.StateManager;
 import agano.runner.swing.MainForm;
@@ -20,6 +19,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -38,6 +38,7 @@ public final class Main {
 
     private final MainForm form;
     private final UdpServer udpServer;
+    private final TcpServer tcpServer;
     private final NetHelper netHelper;
     private final Config config;
 
@@ -70,24 +71,21 @@ public final class Main {
     public Main(
             MainForm.Factory formFactory,
             EventBus eventBus,
+            EventBusBinder binder,
             StateManager stateManager,
-            Controllers controller,
-            ReceiveMessageController receiveMessageController,
-            SendMessageController sendMessageController,
             ServerManager serverManager,
             NetHelper netHelper,
             Config config) {
 
         this.form = formFactory.newInstance(this::shutdown);
         this.udpServer = serverManager.getUdpServer();
+        this.tcpServer = serverManager.getTcpServer();
         this.netHelper = netHelper;
         this.config = config;
 
         stateManager.register(form);
 
-        eventBus.register(controller);
-        eventBus.register(receiveMessageController);
-        eventBus.register(sendMessageController);
+        binder.bind();
 
         eventBus.post(new Parameters.RefreshParameter());
 
@@ -98,12 +96,11 @@ public final class Main {
                 new MessageBuilder().setUp(config, IPMSG_BR_EXIT, "").build(),
                 new InetSocketAddress(netHelper.broadcastAddress(), config.getPort())
         );
-        try {
-            udpServer.shutdown().sync();
-            logger.debug("Application is about to shutdown successfully. Event: {}", event);
-        } catch (InterruptedException e) {
-            logger.warn("Failed to shutdown the server.", e);
-        }
+        Future fUdp = udpServer.shutdown();
+        Future fTcp = tcpServer.shutdown();
+        fUdp.syncUninterruptibly();
+        fTcp.syncUninterruptibly();
+        logger.debug("Application is about to shutdown successfully. Event: {}", event);
         System.exit(0);
     }
 

@@ -1,6 +1,7 @@
 package agano.runner.swing;
 
 import agano.config.Config;
+import agano.runner.parameter.SendFileParameter;
 import agano.runner.parameter.SendMessageParameter;
 import agano.util.AganoException;
 import com.google.common.eventbus.EventBus;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.google.common.base.Strings.nullToEmpty;
+import static java.util.stream.Collectors.toSet;
 
 public final class ChatTextInputImpl implements ChatTextInput {
 
@@ -92,6 +94,11 @@ public final class ChatTextInputImpl implements ChatTextInput {
                     @SuppressWarnings("unchecked")
                     List<File> files = (List<File>) transferSupport.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     logger.debug("Dropped: {}", files);
+                    eventBus.post(new SendFileParameter(
+                            textArea.getText(),
+                            files.stream().map(File::toPath).collect(toSet())
+                    ));
+                    SwingUtilities.invokeLater(() -> textArea.setText(""));
                     return true;
                 } else if (transferSupport.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                     String str = (String) transferSupport.getTransferable().getTransferData(DataFlavor.stringFlavor);

@@ -7,8 +7,11 @@ public class ServerModule extends AbstractModule {
 
     protected void configure() {
         install(new FactoryModuleBuilder()
-                        .implement(NettyUdpServer.class, NettyUdpServer.class)
-                        .build(NettyUdpServer.Factory.class));
+                        .implement(UdpServer.class, UdpServer.class)
+                        .build(UdpServer.Factory.class));
+        install(new FactoryModuleBuilder()
+                        .implement(TcpServer.class, TcpServer.class)
+                        .build(TcpServer.Factory.class));
     }
 
 }

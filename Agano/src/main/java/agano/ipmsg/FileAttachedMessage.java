@@ -19,12 +19,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class FileAttachedMessage extends Message {
 
-    private final List<Attachment> attachments;
+    private final List<? extends Attachment> attachments;
 
     /**
      * {@inheritDoc}
-     *
-     * @param version
+     *  @param version
      * @param packetNumber
      * @param user
      * @param host
@@ -41,7 +40,7 @@ public final class FileAttachedMessage extends Message {
             @Nonnull Operation operation,
             @Nonnull String load, // 添付ファイル情報を含まない
             int port,
-            @Nonnull List<Attachment> attachments) {
+            @Nonnull List<? extends Attachment> attachments) {
         super(version, packetNumber, user, host, operation, load, port);
         this.attachments = checkNotNull(attachments);
 
@@ -50,7 +49,7 @@ public final class FileAttachedMessage extends Message {
     }
 
     @Nonnull
-    public List<Attachment> getAttachments() {
+    public List<? extends Attachment> getAttachments() {
         return attachments;
     }
 

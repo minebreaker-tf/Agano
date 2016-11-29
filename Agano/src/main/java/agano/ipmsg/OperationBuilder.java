@@ -2,6 +2,7 @@ package agano.ipmsg;
 
 import javax.annotation.Nonnull;
 import java.util.EnumSet;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -22,22 +23,26 @@ public final class OperationBuilder {
 
     @Nonnull
     public static OperationBuilder of(@Nonnull Command command) {
-        checkNotNull(command);
-        return new OperationBuilder(command);
+        return new OperationBuilder(checkNotNull(command));
     }
 
     @Nonnull
     public static OperationBuilder ofDefault(@Nonnull Command command) {
-        checkNotNull(command);
-        OperationBuilder builder = new OperationBuilder(command);
+        OperationBuilder builder = new OperationBuilder(checkNotNull(command));
         builder.operations.addAll(defaultOperations);
         return builder;
     }
 
     @Nonnull
     public OperationBuilder add(@Nonnull Option option) {
+        operations.add(checkNotNull(option));
+        return this;
+    }
+
+    @Nonnull
+    public OperationBuilder addAll(@Nonnull Set<Option> option) {
         checkNotNull(option);
-        operations.add(option);
+        option.forEach(operations::add);
         return this;
     }
 

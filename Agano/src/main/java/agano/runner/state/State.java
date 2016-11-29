@@ -1,12 +1,15 @@
 package agano.runner.state;
 
 import agano.ipmsg.Message;
+import agano.ipmsg.SendableAttachment;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -16,22 +19,24 @@ public final class State {
 
     private List<User> users;
     private Optional<User> selected;
+    private Set<SendableAttachment> sendableFiles;
     private boolean windowFocused;
 
-    private State(@Nonnull List<User> users, Optional<User> selected, boolean windowFocused) {
+    private State(@Nonnull List<User> users, Optional<User> selected, Set<SendableAttachment> sendableFiles, boolean windowFocused) {
         this.users = ImmutableList.copyOf(checkNotNull(users));
         this.selected = checkNotNull(selected);
+        this.sendableFiles = checkNotNull(sendableFiles);
         this.windowFocused = windowFocused;
     }
 
     @Nonnull
     static State initialState() {
-        return new State(Collections.emptyList(), Optional.empty(), false);
+        return new State(Collections.emptyList(), Optional.empty(), Collections.emptySet(), false);
     }
 
     @Nonnull
     private State copy() {
-        return new State(users, selected, windowFocused);
+        return new State(users, selected, sendableFiles, windowFocused);
     }
 
     /**
@@ -47,6 +52,11 @@ public final class State {
     @Nonnull
     public Optional<User> getSelectedUser() {
         return selected;
+    }
+
+    @Nonnull
+    public Set<SendableAttachment> getSendableFiles() {
+        return sendableFiles;
     }
 
     @Nonnull
@@ -117,6 +127,17 @@ public final class State {
     public State changeFocus(boolean windowFocused) {
         State newState = copy();
         newState.windowFocused = windowFocused;
+        return newState;
+    }
+
+    @Nonnull
+    public State addSendableFile(SendableAttachment attachment) {
+        State newState = copy();
+
+        ImmutableSet.Builder<SendableAttachment> builder = ImmutableSet.builder();
+        builder.addAll(sendableFiles).add(attachment);
+        newState.sendableFiles = builder.build();
+
         return newState;
     }
 
