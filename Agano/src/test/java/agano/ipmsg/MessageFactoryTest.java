@@ -64,7 +64,7 @@ public class MessageFactoryTest {
         assertThat(message.getLoad(), is("メッセージ"));
         assertThat(message.getPort(), is(2425));
 
-        List<Attachment> attachments = message.getAttachments();
+        List<? extends Attachment> attachments = message.getAttachments();
         assertThat(attachments.size(), is(2));
         Attachment att1 = attachments.get(0);
         Attachment att2 = attachments.get(1);
