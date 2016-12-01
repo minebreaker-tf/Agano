@@ -23,7 +23,8 @@ public final class FileAttachedMessage extends Message {
 
     /**
      * {@inheritDoc}
-     *  @param version
+     *
+     * @param version
      * @param packetNumber
      * @param user
      * @param host

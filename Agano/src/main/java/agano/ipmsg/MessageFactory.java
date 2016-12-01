@@ -35,7 +35,7 @@ public final class MessageFactory {
 
             List<String> packet = split(message);
 
-            return new Message(
+            Message tmp = new Message(
                     packet.get(0),
                     Long.parseLong(packet.get(1)),
                     packet.get(2),
@@ -44,6 +44,16 @@ public final class MessageFactory {
                     packet.get(5),
                     port
             );
+
+            if (tmp.getOperation().isEnabledOption(Option.IPMSG_FILEATTACHOPT)) {
+                try {
+                    return fileAttachedMessageFromString(message, port);
+                } catch (MalformedMessageException e) {
+                    return tmp;
+                }
+            } else {
+                return tmp;
+            }
 
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             throw new MalformedMessageException(message, e);

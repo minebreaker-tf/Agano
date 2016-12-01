@@ -30,7 +30,7 @@ public final class FileInfo {
 
     public FileInfo(long raw) {
         this.code = raw;
-        this.fileType = FileType.find(code).orElseThrow(() -> new AganoException("Unrecognizable file type specified."));
+        this.fileType = FileType.find(code).orElseThrow(() -> new AganoException("Unrecognizable file type specified: " + code));
         this.attributes = Attribute.find(raw);
     }
 

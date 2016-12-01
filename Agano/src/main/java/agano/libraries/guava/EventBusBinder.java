@@ -1,9 +1,6 @@
 package agano.libraries.guava;
 
-import agano.runner.controller.Controllers;
-import agano.runner.controller.ReceiveMessageController;
-import agano.runner.controller.SendFileController;
-import agano.runner.controller.SendMessageController;
+import agano.runner.controller.*;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
@@ -13,6 +10,7 @@ public final class EventBusBinder {
     private final Controllers controllers;
     private final ReceiveMessageController receiveMessageController;
     private final SendMessageController sendMessageController;
+    private final ReceiveFileController receiveFileController;
     private final SendFileController sendFileController;
 
     @Inject
@@ -21,11 +19,13 @@ public final class EventBusBinder {
             Controllers controllers,
             ReceiveMessageController receiveMessageController,
             SendMessageController sendMessageController,
+            ReceiveFileController receiveFileController,
             SendFileController sendFileController) {
         this.eventBus = eventBus;
         this.controllers = controllers;
         this.receiveMessageController = receiveMessageController;
         this.sendMessageController = sendMessageController;
+        this.receiveFileController = receiveFileController;
         this.sendFileController = sendFileController;
     }
 
@@ -33,6 +33,7 @@ public final class EventBusBinder {
         eventBus.register(controllers);
         eventBus.register(receiveMessageController);
         eventBus.register(sendMessageController);
+        eventBus.register(receiveFileController);
         eventBus.register(sendFileController);
     }
 

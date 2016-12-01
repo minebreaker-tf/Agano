@@ -58,7 +58,7 @@ public final class Main {
             if (t.getCause() instanceof BindException) {
                 JOptionPane.showMessageDialog(
                         null,
-                        "Failed to bind the socket.\nMaybe the port is already used by an another application.",
+                        "Failed to bind the socket.\nMaybe the port is already used by another application.",
                         "Error",
                         JOptionPane.WARNING_MESSAGE
                 );

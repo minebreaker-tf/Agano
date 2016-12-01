@@ -92,7 +92,7 @@ public class Attachment {
                     sep[1],
                     Long.parseLong(sep[2], 16),
                     Long.parseLong(sep[3], 16),
-                    new FileInfo(Long.parseLong(sep[4]))
+                    new FileInfo(Long.parseLong(sep[4], 16))
             ));
         }
 

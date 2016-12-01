@@ -22,17 +22,19 @@ public final class IconFontButton implements Viewable {
 
     private static final Logger logger = LoggerFactory.getLogger(IconFontButton.class);
 
-    private static final Font font = createFont();
-    private static final int iconFontSize = 18;
+    private static final int size = 24;
+    private static final int sizeB = 48;
+    private static final Font font = createFont(18);
+    private static final Font fontB = createFont(42);
 
     private final JButton button;
 
-    private IconFontButton(IconConstants icon, ActionListener listener) {
+    private IconFontButton(IconConstants icon, ActionListener listener, int size, Font font) {
         button = new JButton(icon.getCodePoint());
 
         button.setUI(new BasicButtonUI());
         button.setFont(font);
-        button.setPreferredSize(new Dimension(24, 24));
+        button.setPreferredSize(new Dimension(size, size));
         button.setBackground(SwingUtils.appBackgorund());
         button.setOpaque(true);
         button.setBorder(BorderFactory.createLineBorder(SwingUtils.editorText(), 1));
@@ -43,13 +45,13 @@ public final class IconFontButton implements Viewable {
             button.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    button.setBorderPainted(true);
+//                    button.setBorderPainted(true);
                     button.setBackground(SwingUtils.buttonHighlight());
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    button.setBorderPainted(false);
+//                    button.setBorderPainted(false);
                     button.setBackground(SwingUtils.appBackgorund());
                 }
             });
@@ -58,20 +60,25 @@ public final class IconFontButton implements Viewable {
 
     @Nonnull
     public static IconFontButton newInstance(@Nonnull IconConstants icon) {
-        return new IconFontButton(checkNotNull(icon), null);
+        return new IconFontButton(checkNotNull(icon), null, size, font);
     }
 
     @Nonnull
-    public static IconFontButton newInstance(@Nonnull IconConstants icon, @Nullable ActionListener listener) {
-        return new IconFontButton(checkNotNull(icon), listener);
+    public static IconFontButton newInstance(@Nonnull IconConstants icon, @Nullable ActionListener onClick) {
+        return new IconFontButton(checkNotNull(icon), onClick, size, font);
     }
 
-    private static Font createFont() {
+    @Nonnull
+    public static IconFontButton newBiggerInstance(@Nonnull IconConstants icon, @Nullable ActionListener onClick) {
+        return new IconFontButton(checkNotNull(icon), onClick, sizeB, fontB);
+    }
+
+    private static Font createFont(int size) {
         try {
             return Font.createFont(
                     Font.TRUETYPE_FONT,
                     IconFontButton.class.getResourceAsStream(Constants.iconFont)
-            ).deriveFont(Font.PLAIN, iconFontSize);
+            ).deriveFont(Font.PLAIN, size);
 
         } catch (FontFormatException | IOException e) {
             logger.warn("Failed to load font.", e);
