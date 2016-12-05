@@ -11,7 +11,7 @@ import com.google.inject.Injector;
 
 import javax.swing.*;
 import java.net.InetSocketAddress;
-import java.util.Collections;
+import java.util.Arrays;
 
 public class UICheck {
 
@@ -26,8 +26,17 @@ public class UICheck {
         StateManager manager = injector.getInstance(StateManager.class);
         manager.register(form);
 
-        User user = new User("test-user", new InetSocketAddress("localhost", 2425), Collections.singletonList(
-                MessageFactory.fromString("1:123:test-user:localhost:00000001:Testing...", 2425)));
+        User user = new User("test-user", new InetSocketAddress("localhost", 2425), Arrays.asList(
+                MessageFactory.fileAttachedMessageFromString("1:124:test-user:localhost:2097184:メッセージ" + "\0" + "123:name.txt:10:10:1:", 2425),
+                MessageFactory.fileAttachedMessageFromString("1:124:test-user:localhost:2097184:メッセージ" + "\0" + "123:name.txt:10:10:1:", 2425),
+                MessageFactory.fileAttachedMessageFromString("1:124:test-user:localhost:2097184:メッセージ" + "\0" + "123:name.txt:10:10:1:", 2425),
+                MessageFactory.fileAttachedMessageFromString(
+                        "1:124:test-user:localhost:2097184:メッセージ" + "\0" +
+                        "123:name.txt:10:10:1:" + "\07" + "456:name.dat:A:B:2:" + "\07" + "789:name.sql:A:B:2:", 2425),
+                MessageFactory.fileAttachedMessageFromString("1:124:test-user:localhost:2097184:メッセージ" + "\0" + "123:name.txt:10:10:1:", 2425),
+                MessageFactory.fileAttachedMessageFromString("1:124:test-user:localhost:2097184:メッセージ" + "\0" + "123:name.txt:10:10:1:", 2425),
+                MessageFactory.fromString("1:123:test-user:localhost:00000001:Testing...", 2425)
+        ));
         manager.swap(state -> state.addUser(user));
         manager.swap(state -> state.selectUser(user));
     }

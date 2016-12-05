@@ -75,7 +75,7 @@ public class MessageBuilderTest {
 
         assertThat(built.getAttachments().size(), is(1));
         assertThat(built.getAttachments().get(0).getFileID(), is(123L));
-        assertThat(built.getAttachments().get(0).getFilename(), is("text.txt"));
+        assertThat(built.getAttachments().get(0).getFileName(), is("text.txt"));
         assertThat(built.getAttachments().get(0).getFilesize(), is(10L));
         assertThat(built.getAttachments().get(0).getMtime(), is(11L));
         assertThat(built.getAttachments().get(0).getFileInfo().getFileType(), is(FileType.IPMSG_FILE_REGULAR));

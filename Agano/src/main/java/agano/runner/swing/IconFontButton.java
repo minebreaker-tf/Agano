@@ -28,14 +28,16 @@ public final class IconFontButton implements Viewable {
     private static final Font fontB = createFont(42);
 
     private final JButton button;
+    private final Color bgColor;
 
-    private IconFontButton(IconConstants icon, ActionListener listener, int size, Font font) {
+    private IconFontButton(IconConstants icon, ActionListener listener, int size, Font font, Color backgroundColor) {
         button = new JButton(icon.getCodePoint());
+        bgColor = backgroundColor == null ? SwingUtils.appBackgorund() : backgroundColor;
 
         button.setUI(new BasicButtonUI());
         button.setFont(font);
         button.setPreferredSize(new Dimension(size, size));
-        button.setBackground(SwingUtils.appBackgorund());
+        button.setBackground(bgColor);
         button.setOpaque(true);
         button.setBorder(BorderFactory.createLineBorder(SwingUtils.editorText(), 1));
         button.setBorderPainted(false);
@@ -52,7 +54,7 @@ public final class IconFontButton implements Viewable {
                 @Override
                 public void mouseExited(MouseEvent e) {
 //                    button.setBorderPainted(false);
-                    button.setBackground(SwingUtils.appBackgorund());
+                    button.setBackground(bgColor);
                 }
             });
         }
@@ -60,17 +62,17 @@ public final class IconFontButton implements Viewable {
 
     @Nonnull
     public static IconFontButton newInstance(@Nonnull IconConstants icon) {
-        return new IconFontButton(checkNotNull(icon), null, size, font);
+        return new IconFontButton(checkNotNull(icon), null, size, font, null);
     }
 
     @Nonnull
     public static IconFontButton newInstance(@Nonnull IconConstants icon, @Nullable ActionListener onClick) {
-        return new IconFontButton(checkNotNull(icon), onClick, size, font);
+        return new IconFontButton(checkNotNull(icon), onClick, size, font, null);
     }
 
     @Nonnull
-    public static IconFontButton newBiggerInstance(@Nonnull IconConstants icon, @Nullable ActionListener onClick) {
-        return new IconFontButton(checkNotNull(icon), onClick, sizeB, fontB);
+    public static IconFontButton newBiggerInstance(@Nonnull IconConstants icon, @Nullable Color backgroundColor, @Nullable ActionListener onClick) {
+        return new IconFontButton(checkNotNull(icon), onClick, sizeB, fontB, backgroundColor);
     }
 
     private static Font createFont(int size) {

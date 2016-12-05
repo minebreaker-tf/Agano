@@ -4,6 +4,7 @@ import agano.runner.swing.Observer;
 import com.google.inject.Singleton;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
@@ -22,6 +23,11 @@ public final class StateManager {
     @Nonnull
     public State get() {
         return state.get();
+    }
+
+    @Nullable
+    public synchronized Observer<State> getObserver() {
+        return observer;
     }
 
     /**

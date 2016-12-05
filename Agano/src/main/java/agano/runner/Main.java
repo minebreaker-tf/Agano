@@ -60,7 +60,7 @@ public final class Main {
                         null,
                         "Failed to bind the socket.\nMaybe the port is already used by another application.",
                         "Error",
-                        JOptionPane.WARNING_MESSAGE
+                        JOptionPane.ERROR_MESSAGE
                 );
             }
             System.exit(-1);

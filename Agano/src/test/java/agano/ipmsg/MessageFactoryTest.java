@@ -70,14 +70,14 @@ public class MessageFactoryTest {
         Attachment att2 = attachments.get(1);
 
         assertThat(att1.getFileID(), is(123L));
-        assertThat(att1.getFilename(), is("name.txt"));
+        assertThat(att1.getFileName(), is("name.txt"));
         assertThat(att1.getFilesize(), is(16L));
         assertThat(att1.getMtime(), is(16L));
         assertThat(att1.getFileInfo().getFileType(), is(FileType.IPMSG_FILE_REGULAR));
         assertThat(att1.getFileInfo().getAttributes().isEmpty(), is(true));
 
         assertThat(att2.getFileID(), is(456L));
-        assertThat(att2.getFilename(), is("name.dat"));
+        assertThat(att2.getFileName(), is("name.dat"));
         assertThat(att2.getFilesize(), is(10L));
         assertThat(att2.getMtime(), is(11L));
         assertThat(att2.getFileInfo().getFileType(), is(FileType.IPMSG_FILE_DIR));

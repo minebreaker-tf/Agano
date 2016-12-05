@@ -36,7 +36,7 @@ public class Attachment {
         return fileID;
     }
 
-    public String getFilename() {
+    public String getFileName() {
         return filename;
     }
 
@@ -65,8 +65,8 @@ public class Attachment {
     public String explain() {
         return MoreObjects.toStringHelper(this)
                           .add("FileID", getFileID())
-                          .add("Filename", getFilename())
-                          .add("Filesize", getFilesize())
+                          .add("Filename", getFileName())
+                          .add("FileSize", getFilesize())
                           .add("Mtime", getMtime())
                           .add("FileInfo", getFileInfo())
                           .toString();

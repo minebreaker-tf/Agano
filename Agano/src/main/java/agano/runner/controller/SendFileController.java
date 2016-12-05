@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public final class SendFileController {
             if (!Files.exists(path)) {
                 logger.info("Attached file does not exist.");
                 JOptionPane.showMessageDialog(
-                        null,
+                        (Component) stateManager.getObserver(),
                         "File does not exist.",
                         "Error",
                         JOptionPane.WARNING_MESSAGE

@@ -70,6 +70,11 @@ public final class MainForm implements Observer<State> {
         chatPane.update(state);
     }
 
+    @Nonnull
+    public JFrame getFrame() {
+        return frame;
+    }
+
     private class WindowFocusListenerAdaptor implements WindowFocusListener {
 
         private void post(WindowEvent e) {

@@ -97,8 +97,10 @@ public final class ChatTextViewImpl implements ChatTextView {
                     offset += msg.length();
 
                     if (each instanceof FileAttachedMessage) {
-                        fileAttachedMessages.add(new Pair(offset, (FileAttachedMessage) each));
-                        doc.insertString(offset++, "\n", defaultAttr);
+                        FileAttachedMessage fam = (FileAttachedMessage) each;
+                        fileAttachedMessages.add(new Pair(offset, fam));
+                        doc.insertString(offset, "\n", defaultAttr);
+                        offset++;
                     }
                 }
             } catch (BadLocationException e) {
@@ -106,10 +108,12 @@ public final class ChatTextViewImpl implements ChatTextView {
             }
 
             chatText.setStyledDocument(doc);
-            for (Pair each : fileAttachedMessages) {
-                chatText.setCaretPosition(each.getOffset());
-                for (Attachment attachment : each.getMessage().getAttachments()) {
-                    chatText.insertComponent(chatTextMessage(each.getMessage(), attachment).component());
+            int cnt = 0;
+            for (Pair msg : fileAttachedMessages) {
+                for (Attachment attachment : msg.getMessage().getAttachments()) {
+                    chatText.setCaretPosition(msg.getOffset() + cnt);
+                    chatText.insertComponent(chatTextMessage(msg.getMessage(), attachment).component());
+                    cnt++;
                 }
             }
 
@@ -142,8 +146,8 @@ public final class ChatTextViewImpl implements ChatTextView {
 
     }
 
-    private ChatTextMessage chatTextMessage(FileAttachedMessage original, Attachment attachment) {
-        return new ChatTextMessage(IconConstants.FILE, config.getFont(), attachment.getFilename(), e ->
+    private ChatTextAttachmentMessage chatTextMessage(FileAttachedMessage original, Attachment attachment) {
+        return new ChatTextAttachmentMessage(IconConstants.FILE, config.getFont(), attachment, e ->
                 eventBus.post(new ReceiveFileParameter(
                         original,
                         attachment

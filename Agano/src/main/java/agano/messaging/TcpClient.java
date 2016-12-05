@@ -1,5 +1,6 @@
 package agano.messaging;
 
+import agano.ipmsg.FileSendRequestMessage;
 import agano.ipmsg.Message;
 import agano.util.AganoException;
 import io.netty.bootstrap.Bootstrap;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -37,7 +39,7 @@ public final class TcpClient {
     private final EventLoopGroup group = new NioEventLoopGroup();
 
     @Nonnull
-    public ChannelFuture submit(@Nonnull Message message, @Nonnull InetSocketAddress destination, int size, @Nonnull Path saveTo) {
+    public ChannelFuture submit(@Nonnull FileSendRequestMessage message, @Nonnull InetSocketAddress destination, int size, @Nonnull Path saveTo) {
         checkNotNull(message);
         checkNotNull(destination);
         checkNotNull(saveTo);
@@ -51,21 +53,33 @@ public final class TcpClient {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() { // TODO fragmentation issue
                             @Override
-                            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+                            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
                                 msg.retain();
 
                                 // ファイル受信
                                 Message relevant = ctx.channel().attr(MESSAGE).get();
-                                if (relevant == null) throw new AganoException("Something is wrong with application state.");
+                                if (relevant == null) throw new AganoException("Something is wrong with application state: message = null");
                                 Path saveTo = ctx.channel().attr(PATH).get();
-                                if (saveTo == null) throw new AganoException("Something is wrong with application state.");
+                                if (saveTo == null) throw new AganoException("Something is wrong with application state: path = null");
                                 int size = ctx.channel().attr(SIZE).get();
 
-                                logger.info("Receiving file. File: {} Size: {}", saveTo, size);
+                                logger.info("Receiving file. Saved to: {} Size: {}", saveTo, size);
 
                                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(saveTo))) { // Truncate file if exists
                                     msg.readBytes(bos, size);
+                                    JOptionPane.showMessageDialog(
+                                            null,
+                                            "File transfer completed: " + saveTo.getFileName(),
+                                            "File transfer completed",
+                                            JOptionPane.INFORMATION_MESSAGE
+                                    );
                                 } catch (IOException e) {
+                                    JOptionPane.showMessageDialog(
+                                            null,
+                                            "File transfer failed.: " + saveTo.getFileName(),
+                                            "Warning",
+                                            JOptionPane.WARNING_MESSAGE
+                                    );
                                     throw new AganoException("Failed to write file.", e);
                                 } catch (IndexOutOfBoundsException e) {
                                     throw new AganoException("Sent file size differs from claimed one.", e);
@@ -77,7 +91,7 @@ public final class TcpClient {
                             }
 
                             @Override
-                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) throws Exception {
+                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
                                 logger.warn("Error while receiving the file.", t);
                                 ctx.close();
                                 group.shutdownGracefully();
@@ -90,7 +104,7 @@ public final class TcpClient {
         ch.attr(PATH).set(saveTo);
         ch.attr(SIZE).set(size);
         ByteBuf buf = ch.alloc().buffer();
-        buf.writeCharSequence(message.toString() + ":", StandardCharsets.UTF_8);
+        buf.writeCharSequence(message.toString(), StandardCharsets.UTF_8);
         return ch.writeAndFlush(buf);
     }
 
