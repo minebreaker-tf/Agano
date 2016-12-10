@@ -13,8 +13,9 @@ public class ConfigModuleForTest extends AbstractModule {
 
     @Provides
     public Config provideConfig() {
+        //noinspection SpellCheckingInspection
         return new Config(ConfigFactory.parseMap(ImmutableMap.of(
-                "user.name", "default",
+                "user.shownname", "default",
                 "port", 62425,
                 "font.size", 10,
                 "font.name", Font.SANS_SERIF,

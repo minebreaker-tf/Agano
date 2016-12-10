@@ -12,6 +12,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Optional;
 
+@SuppressWarnings("SpellCheckingInspection")
 public final class Config {
 
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
@@ -73,7 +74,7 @@ public final class Config {
     }
 
     private String createUsername() {
-        Optional<String> username = getString("user.name");
+        Optional<String> username = getString("user.shownname");
         if (username.isPresent()) {
             return username.get();
         } else {
