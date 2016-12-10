@@ -26,6 +26,7 @@ public final class HelpDialog {
     @Inject
     public HelpDialog(Config config) {
         dialog = new JDialog();
+        dialog.setModal(true);
         dialog.setTitle(Constants.title);
         dialog.setSize(400, 250);
         dialog.setResizable(false);
@@ -58,7 +59,6 @@ public final class HelpDialog {
 
     public void showDialog() {
         dialog.setVisible(true);
-        dialog.requestFocus();
     }
 
     public void closeDialog() {

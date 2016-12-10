@@ -6,6 +6,7 @@ import agano.messaging.ServerManager;
 import agano.runner.parameter.SendFileParameter;
 import agano.runner.state.StateManager;
 import agano.runner.state.User;
+import agano.runner.swing.MainForm;
 import agano.util.AganoException;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -57,8 +57,9 @@ public final class SendFileController {
         parameter.getAttachments().forEach(path -> {
             if (!Files.exists(path)) {
                 logger.info("Attached file does not exist.");
+                //noinspection ConstantConditions
                 JOptionPane.showMessageDialog(
-                        (Component) stateManager.getObserver(),
+                        ((MainForm) stateManager.getObserver()).getFrame(),
                         "File does not exist.",
                         "Error",
                         JOptionPane.WARNING_MESSAGE

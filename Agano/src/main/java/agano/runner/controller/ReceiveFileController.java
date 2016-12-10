@@ -63,8 +63,7 @@ public final class ReceiveFileController {
                 ((MainForm) stateManager.getObserver()).getFrame(), attachment.getFileName());
         if (!saveTo.isPresent()) return;
 
-        TcpClient tcpClient = new TcpClient();
-        tcpClient.submit(
+        new TcpClient(((MainForm) stateManager.getObserver()).getFrame()).submit(
                 requestMessage,
                 new InetSocketAddress(fileAttachedMessage.getHost(), fileAttachedMessage.getPort()),
                 (int) attachment.getFilesize(),

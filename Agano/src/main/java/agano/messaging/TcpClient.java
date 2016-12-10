@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -37,9 +39,19 @@ public final class TcpClient {
     private static final AttributeKey<Integer> SIZE = AttributeKey.valueOf("SIZE");
 
     private final EventLoopGroup group = new NioEventLoopGroup();
+    private final Component mainForm;
+
+    public TcpClient(@Nullable Component mainForm) {
+        this.mainForm = mainForm;
+    }
 
     @Nonnull
-    public ChannelFuture submit(@Nonnull FileSendRequestMessage message, @Nonnull InetSocketAddress destination, int size, @Nonnull Path saveTo) {
+    public ChannelFuture submit(
+            @Nonnull FileSendRequestMessage message,
+            @Nonnull InetSocketAddress destination,
+            int size,
+            @Nonnull Path saveTo) {
+
         checkNotNull(message);
         checkNotNull(destination);
         checkNotNull(saveTo);
@@ -68,14 +80,14 @@ public final class TcpClient {
                                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(saveTo))) { // Truncate file if exists
                                     msg.readBytes(bos, size);
                                     JOptionPane.showMessageDialog(
-                                            null,
+                                            mainForm,
                                             "File transfer completed: " + saveTo.getFileName(),
                                             "File transfer completed",
                                             JOptionPane.INFORMATION_MESSAGE
                                     );
                                 } catch (IOException e) {
                                     JOptionPane.showMessageDialog(
-                                            null,
+                                            mainForm,
                                             "File transfer failed.: " + saveTo.getFileName(),
                                             "Warning",
                                             JOptionPane.WARNING_MESSAGE
