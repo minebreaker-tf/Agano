@@ -32,14 +32,14 @@ public final class IconFontButton implements Viewable {
 
     private IconFontButton(IconConstants icon, ActionListener listener, int size, Font font, Color backgroundColor) {
         button = new JButton(icon.getCodePoint());
-        bgColor = backgroundColor == null ? SwingUtils.appBackgorund() : backgroundColor;
+        bgColor = backgroundColor == null ? Colors.appBackgorund : backgroundColor;
 
         button.setUI(new BasicButtonUI());
         button.setFont(font);
         button.setPreferredSize(new Dimension(size, size));
         button.setBackground(bgColor);
         button.setOpaque(true);
-        button.setBorder(BorderFactory.createLineBorder(SwingUtils.editorText(), 1));
+        button.setBorder(BorderFactory.createLineBorder(Colors.editorText, 1));
         button.setBorderPainted(false);
 
         if (listener != null) {
@@ -48,7 +48,7 @@ public final class IconFontButton implements Viewable {
                 @Override
                 public void mouseEntered(MouseEvent e) {
 //                    button.setBorderPainted(true);
-                    button.setBackground(SwingUtils.buttonHighlight());
+                    button.setBackground(Colors.buttonHighlight);
                 }
 
                 @Override

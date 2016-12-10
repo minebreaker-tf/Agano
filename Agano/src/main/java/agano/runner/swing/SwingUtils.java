@@ -15,7 +15,7 @@ public final class SwingUtils {
 
     private SwingUtils() {}
 
-    public static Color fromRGB(int r, int g, int b) {
+    private static Color fromRGB(int r, int g, int b) {
         float[] hsb = Color.RGBtoHSB(r, g, b, null);
         return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
     }
@@ -58,38 +58,6 @@ public final class SwingUtils {
         } else {
             return Optional.empty();
         }
-    }
-
-    public static Color timestamp() {
-        return fromRGB(106, 135, 89);
-    }
-
-    public static Color username() {
-        return fromRGB(255, 198, 109);
-    }
-
-    public static Color hyperlink() {
-        return fromRGB(40, 123, 222);
-    }
-
-    public static Color editorText() {
-        return fromRGB(169, 183, 198);
-    }
-
-    public static Color appBackgorund() {
-        return fromRGB(60, 63, 65);
-    }
-
-    public static Color buttonHighlight() {
-        return fromRGB(85, 85, 85);
-    }
-
-    public static Color textFieldBorder() {
-        return fromRGB(62, 78, 93);
-    }
-
-    public static Color listBackground() {
-        return fromRGB(62, 67, 76);
     }
 
 }

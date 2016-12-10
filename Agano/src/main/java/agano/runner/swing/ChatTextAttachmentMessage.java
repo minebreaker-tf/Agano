@@ -19,7 +19,7 @@ public final class ChatTextAttachmentMessage implements Viewable {
             @Nonnull Font font,
             @Nonnull Attachment attachment,
             @Nonnull ActionListener onClick) {
-        icon = IconFontButton.newBiggerInstance(iconConstants, SwingUtils.listBackground(), onClick);
+        icon = IconFontButton.newBiggerInstance(iconConstants, Colors.listBackground, onClick);
 
         label = new JLabel(attachment.getFileName() + " (" + attachment.getFilesize() + ")");
         label.setFont(font);
@@ -29,8 +29,8 @@ public final class ChatTextAttachmentMessage implements Viewable {
         base.add(icon.component(), BorderLayout.WEST);
         base.add(label, BorderLayout.CENTER);
 
-        base.setBorder(BorderFactory.createMatteBorder(2, 20, 2, 20, SwingUtils.appBackgorund()));
-        base.setBackground(SwingUtils.listBackground());
+        base.setBorder(BorderFactory.createMatteBorder(2, 20, 2, 20, Colors.appBackgorund));
+        base.setBackground(Colors.listBackground);
         base.setOpaque(true);
 
     }

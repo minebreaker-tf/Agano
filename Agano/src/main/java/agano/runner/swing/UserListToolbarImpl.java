@@ -47,11 +47,11 @@ public class UserListToolbarImpl implements UserListToolbar {
 
     private JComponent searcher() {
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createLineBorder(SwingUtils.textFieldBorder(), 3));
+        panel.setBorder(BorderFactory.createLineBorder(Colors.textFieldBorder, 3));
         panel.setLayout(new BorderLayout());
 
         field.setBorder(BorderFactory.createEmptyBorder());
-        field.setBackground(SwingUtils.appBackgorund());
+        field.setBackground(Colors.appBackgorund);
         field.setMargin(new Insets(0, 0, 0, 0));
         panel.add(field, BorderLayout.CENTER);
 

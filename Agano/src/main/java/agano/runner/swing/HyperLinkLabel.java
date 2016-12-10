@@ -26,7 +26,7 @@ public final class HyperLinkLabel implements Viewable {
         checkNotNull(linkTo);
 
         label.setFont(linkFont(original));
-        label.setForeground(SwingUtils.hyperlink());
+        label.setForeground(Colors.hyperlink);
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         label.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
