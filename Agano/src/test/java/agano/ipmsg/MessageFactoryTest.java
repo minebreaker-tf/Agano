@@ -43,6 +43,34 @@ public class MessageFactoryTest {
         assertThat(message.getPort(), is(2425));
     }
 
+    @Test
+    public void testEmptyLoad() {
+        String original = "1:123:user:host:1";
+        Message message = MessageFactory.fromString(original, 2425);
+
+        assertThat(message.getVersion(), is("1"));
+        assertThat(message.getPacketNumber(), is(123L));
+        assertThat(message.getUser(), is("user"));
+        assertThat(message.getHost(), is("host"));
+        assertThat(message.getOperation().getCode(), is(1L));
+        assertThat(message.getLoad(), is(""));
+        assertThat(message.getPort(), is(2425));
+    }
+
+    @Test
+    public void testEmptyLoadHavingComma() {
+        String original = "1:123:user:host:1:";
+        Message message = MessageFactory.fromString(original, 2425);
+
+        assertThat(message.getVersion(), is("1"));
+        assertThat(message.getPacketNumber(), is(123L));
+        assertThat(message.getUser(), is("user"));
+        assertThat(message.getHost(), is("host"));
+        assertThat(message.getOperation().getCode(), is(1L));
+        assertThat(message.getLoad(), is(""));
+        assertThat(message.getPort(), is(2425));
+    }
+
     @Test(expected = MalformedMessageException.class)
     public void testInvalid() {
         MessageFactory.fromString("Some invalid string", 2425);

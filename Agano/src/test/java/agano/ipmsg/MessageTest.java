@@ -57,4 +57,15 @@ public class MessageTest {
         assertThat(msg1.equals(msg2), is(true));
     }
 
+    @Test
+    public void testToString() {
+        assertThat(message.toString(), is("1:123:user:host:1:load"));
+    }
+
+    @Test
+    public void testStringNotHavingLoad() {
+        Message message = new Message("1", 123, "user", "host", 1L, "", 2425);
+        assertThat(message.toString(), is("1:123:user:host:1"));
+    }
+
 }

@@ -35,13 +35,15 @@ public final class MessageFactory {
 
             List<String> packet = split(message);
 
+            String load = packet.size() > 5 ? packet.get(5) : "";
+
             Message tmp = new Message(
                     packet.get(0),
                     Long.parseLong(packet.get(1)),
                     packet.get(2),
                     packet.get(3),
                     Long.parseLong(packet.get(4)),
-                    packet.get(5),
+                    load,
                     port
             );
 

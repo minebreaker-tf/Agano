@@ -92,7 +92,9 @@ public class Message {
      */
     @Override
     public String toString() {
-        return Joiner.on(":").join(Constants.protocolVersion, packetNumber, user, host, operation, load);
+        String ret = Joiner.on(":").join(Constants.protocolVersion, packetNumber, user, host, operation);
+        if (!load.isEmpty()) ret += ":" + load;
+        return ret;
     }
 
     @Nonnull
