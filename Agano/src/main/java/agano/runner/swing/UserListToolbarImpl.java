@@ -30,7 +30,7 @@ public class UserListToolbarImpl implements UserListToolbar {
 
         field = new JTextField();
         field.getDocument().addDocumentListener(new DocumentListenerAdaptor());
-        field.getActionMap().put(DefaultEditorKit.deletePrevCharAction, SwingUtils.beeplessDeletePrevCharAction(field));
+        field.getActionMap().put(DefaultEditorKit.deletePrevCharAction, BeeplessDeletePrevCharAction.beeplessDeletePrevCharAction(field));
         field.setFont(config.getFont().deriveFont((float) Constants.defaultSearchFontSize));
 
         base.setLayout(new BorderLayout());

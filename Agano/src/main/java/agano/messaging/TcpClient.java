@@ -1,42 +1,35 @@
 package agano.messaging;
 
 import agano.ipmsg.FileSendRequestMessage;
-import agano.ipmsg.Message;
-import agano.util.AganoException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * TCP経由でリクエストを送信するためのクラスです.
+ * 現状では一度{@code submit()}を呼び出すと、チャンネルがクローズされます.
+ */
 public final class TcpClient {
 
     private static final Logger logger = LoggerFactory.getLogger(TcpClient.class);
-
-    /** ファイルが添付された関連するメッセージ. */
-    private static final AttributeKey<Message> MESSAGE = AttributeKey.valueOf("MESSAGE");
-    /** 保存先に指定されたファイルのパス(ファイル名を含む). */
-    private static final AttributeKey<Path> PATH = AttributeKey.valueOf("PATH");
-    /** 転送されるファイルのサイズ. */
-    private static final AttributeKey<Integer> SIZE = AttributeKey.valueOf("SIZE");
 
     private final EventLoopGroup group = new NioEventLoopGroup();
     private final Component mainForm;
@@ -45,6 +38,16 @@ public final class TcpClient {
         this.mainForm = mainForm;
     }
 
+    /**
+     * ファイル送信リクエストをTCPポートに送信します.
+     * 要求が受け入れられた場合、ファイルの受信を開始します.
+     *
+     * @param message     ファイルが添付されていたメッセージ
+     * @param destination リクエストの送信先
+     * @param size        転送されるファイルサイズ
+     * @param saveTo      保存先パス
+     * @return リクエストを送信したFuture(ファイル転送の完了ではない)
+     */
     @Nonnull
     public ChannelFuture submit(
             @Nonnull FileSendRequestMessage message,
@@ -63,58 +66,10 @@ public final class TcpClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() { // TODO fragmentation issue
-                            @Override
-                            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-                                msg.retain();
-
-                                // ファイル受信
-                                Message relevant = ctx.channel().attr(MESSAGE).get();
-                                if (relevant == null) throw new AganoException("Something is wrong with application state: message = null");
-                                Path saveTo = ctx.channel().attr(PATH).get();
-                                if (saveTo == null) throw new AganoException("Something is wrong with application state: path = null");
-                                int size = ctx.channel().attr(SIZE).get();
-
-                                logger.info("Receiving file. Saved to: {} Size: {}", saveTo, size);
-
-                                try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(saveTo))) { // Truncate file if exists
-                                    msg.readBytes(bos, size);
-                                    JOptionPane.showMessageDialog(
-                                            mainForm,
-                                            "File transfer completed: " + saveTo.getFileName(),
-                                            "File transfer completed",
-                                            JOptionPane.INFORMATION_MESSAGE
-                                    );
-                                } catch (IOException e) {
-                                    JOptionPane.showMessageDialog(
-                                            mainForm,
-                                            "File transfer failed.: " + saveTo.getFileName(),
-                                            "Warning",
-                                            JOptionPane.WARNING_MESSAGE
-                                    );
-                                    throw new AganoException("Failed to write file.", e);
-                                } catch (IndexOutOfBoundsException e) {
-                                    throw new AganoException("Sent file size differs from claimed one.", e);
-                                } finally {
-                                    msg.release();
-                                    ctx.close();
-                                    group.shutdownGracefully();
-                                }
-                            }
-
-                            @Override
-                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable t) {
-                                logger.warn("Error while receiving the file.", t);
-                                ctx.close();
-                                group.shutdownGracefully();
-                            }
-                        });
+                        ch.pipeline().addLast(new FileReceivingHandler(saveTo, size, mainForm, TcpClient.this::shutdown));
                     }
                 });
         Channel ch = bootstrap.connect(destination).syncUninterruptibly().channel();
-        ch.attr(MESSAGE).set(message);
-        ch.attr(PATH).set(saveTo);
-        ch.attr(SIZE).set(size);
         ByteBuf buf = ch.alloc().buffer();
         buf.writeCharSequence(message.toString(), StandardCharsets.UTF_8);
         return ch.writeAndFlush(buf);
@@ -133,9 +88,7 @@ public final class TcpClient {
     @Override
     protected void finalize() throws Throwable {
         try {
-            if (!group.isShutdown()) shutdown().await();
-        } catch (InterruptedException e) {
-            logger.warn("Failed to shutdown the tcp client.", e);
+            shutdown();
         } finally {
             super.finalize();
         }

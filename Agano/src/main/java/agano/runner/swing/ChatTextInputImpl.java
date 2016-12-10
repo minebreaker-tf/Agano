@@ -57,7 +57,7 @@ public final class ChatTextInputImpl implements ChatTextInput {
             }
         });
         textArea.setTransferHandler(new DropHandler());
-        textArea.getActionMap().put(DefaultEditorKit.deletePrevCharAction, SwingUtils.beeplessDeletePrevCharAction(textArea));
+        textArea.getActionMap().put(DefaultEditorKit.deletePrevCharAction, BeeplessDeletePrevCharAction.beeplessDeletePrevCharAction(textArea));
 
 
         ChatToolbar toolbar = chatToolbar.newInstance(e -> submit());

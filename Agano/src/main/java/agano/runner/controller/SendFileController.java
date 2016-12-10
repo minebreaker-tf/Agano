@@ -102,8 +102,6 @@ public final class SendFileController {
 
         serverManager.getUdpServer().submit(msg, user.get().getAddress());
 
-//        eventBus.post(new SendMessageParameter(parameter.getMessage()));
-
     }
 
 }

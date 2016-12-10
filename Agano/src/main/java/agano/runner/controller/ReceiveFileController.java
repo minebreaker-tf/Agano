@@ -45,23 +45,19 @@ public final class ReceiveFileController {
                 "Receiving non-regular file is not currently supported. FileInfo: %s", attachment
         );
 
+        if (stateManager.getObserver() == null) throw new AganoException("Invalid state.");
+        Optional<Path> saveTo = SwingUtils.showFileSaveDialog(
+                ((MainForm) stateManager.getObserver()).getFrame(), attachment.getFileName());
+        if (!saveTo.isPresent()) return;
+
         FileSendRequestMessage requestMessage = new MessageBuilder()
-                .setUp(
-                        config,
-                        Command.IPMSG_GETFILEDATA,
-                        ""
-                )
+                .setUp(config, Command.IPMSG_GETFILEDATA, "")
                 .fileSendRequest(
                         fileAttachedMessage.getPacketNumber(),
                         attachment.getFileID(),
                         0
                 )
                 .buildFileSendRequest();
-
-        if (stateManager.getObserver() == null) throw new AganoException("Invalid state.");
-        Optional<Path> saveTo = SwingUtils.showFileSaveDialog(
-                ((MainForm) stateManager.getObserver()).getFrame(), attachment.getFileName());
-        if (!saveTo.isPresent()) return;
 
         new TcpClient(((MainForm) stateManager.getObserver()).getFrame()).submit(
                 requestMessage,
