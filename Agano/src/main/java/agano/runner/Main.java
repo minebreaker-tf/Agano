@@ -5,6 +5,8 @@ import agano.config.ConfigModule;
 import agano.ipmsg.MessageBuilder;
 import agano.libraries.guava.EventBusBinder;
 import agano.libraries.guava.EventBusModule;
+import agano.libraries.logback.LoggerConfigurer;
+import agano.libraries.logback.LoggerModule;
 import agano.messaging.ServerManager;
 import agano.messaging.ServerModule;
 import agano.messaging.TcpServer;
@@ -18,6 +20,7 @@ import agano.util.NetHelper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
@@ -50,8 +53,15 @@ public final class Main {
 
             setLaf();
 
-            Guice.createInjector(new EventBusModule(), new SwingModule(), new ServerModule(), new ConfigModule())
-                 .getInstance(Main.class);
+            Injector injector = Guice.createInjector(
+                    new EventBusModule(),
+                    new SwingModule(),
+                    new ServerModule(),
+                    new ConfigModule(),
+                    new LoggerModule()
+            );
+            injector.getInstance(LoggerConfigurer.class).configure();
+            injector.getInstance(Main.class);
 
         } catch (Throwable t) {
             logger.error("Fatal error had occurred.", t);

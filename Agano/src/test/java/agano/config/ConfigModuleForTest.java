@@ -17,7 +17,8 @@ public class ConfigModuleForTest extends AbstractModule {
                 "user.name", "default",
                 "port", 62425,
                 "font.size", 10,
-                "font.name", Font.SANS_SERIF
+                "font.name", Font.SANS_SERIF,
+                "log.level", "trace"
         )));
     }
 

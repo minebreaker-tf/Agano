@@ -2,10 +2,12 @@ package agano.config;
 
 import agano.util.AganoException;
 import agano.util.Constants;
+import ch.qos.logback.classic.Level;
 import com.typesafe.config.ConfigException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Optional;
@@ -19,12 +21,14 @@ public final class Config {
     private final int port;
     private final Font font;
     private final String username;
+    private final Level logLevel;
 
     Config(com.typesafe.config.Config config) {
         this.raw = config;
         this.port = getInt("port").orElse(Constants.defaultPort);
         this.font = createFont();
         this.username = createUsername();
+        this.logLevel = logLevel();
     }
 
     private Optional<String> getString(String path) {
@@ -70,22 +74,36 @@ public final class Config {
 
     private String createUsername() {
         Optional<String> username = getString("user.name");
-        if (username.isPresent())
+        if (username.isPresent()) {
             return username.get();
-        else
+        } else {
             return System.getProperty("user.name");
+        }
+    }
+
+    private Level logLevel() {
+        Optional<String> level = getString("log.level");
+        return level.map(s -> Level.toLevel(s, Level.DEBUG))
+                    .orElse(Level.DEBUG);
     }
 
     public int getPort() {
         return port;
     }
 
+    @Nonnull
     public Font getFont() {
         return font;
     }
 
+    @Nonnull
     public String getUsername() {
         return username;
+    }
+
+    @Nonnull
+    public Level getLogLevel() {
+        return logLevel;
     }
 
 }
