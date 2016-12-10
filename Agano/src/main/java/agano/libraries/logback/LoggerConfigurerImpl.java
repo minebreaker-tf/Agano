@@ -19,7 +19,7 @@ public class LoggerConfigurerImpl implements LoggerConfigurer {
     public void configure() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
-        rootLogger.detachAndStopAllAppenders();
+//        rootLogger.detachAndStopAllAppenders();
         rootLogger.setLevel(config.getLogLevel());
 
 //        PatternLayoutEncoder ple = new PatternLayoutEncoder();
