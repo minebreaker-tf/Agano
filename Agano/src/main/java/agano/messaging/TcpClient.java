@@ -3,13 +3,11 @@ package agano.messaging;
 import agano.ipmsg.FileSendRequestMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +18,7 @@ import java.awt.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,7 +65,19 @@ public final class TcpClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new FileReceivingHandler(saveTo, size, mainForm, TcpClient.this::shutdown));
+                        ch.pipeline().addLast(
+                                new ByteToMessageDecoder() {
+                                    @Override
+                                    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+                                        if (in.readableBytes() < size) {
+                                            return;
+                                        }
+
+                                        out.add(in);
+                                    }
+                                },
+                                new FileReceivingHandler(saveTo, size, mainForm, TcpClient.this::shutdown)
+                        );
                     }
                 });
         Channel ch = bootstrap.connect(destination).syncUninterruptibly().channel();
