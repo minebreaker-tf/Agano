@@ -1,0 +1,3 @@
+checkout:
+  post:
+    - chmod 777 gradlew
