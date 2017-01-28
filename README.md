@@ -1,5 +1,8 @@
 # Agano - LAN Messenger -
 
+![CircleCI](https://circleci.com/bb/minebreaker_tf/agano.svg?style=shield)
+![Java8](https://img.shields.io/badge/Java-8-green.svg?style=flat)
+
 LANメッセンジャーソフトウェア
 
 ![screenshot](./image.png)
